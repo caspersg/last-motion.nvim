@@ -12,15 +12,11 @@ end
 --- @param action string|function: the exact keys for the motion or function to execute
 --- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
 M.exec = function(count, action, pending_chars)
-    -- TODO: does this all work with macros?
-    if type(action) == "string" then
-        -- Handle motion command
+    if type(action) == "string" then -- it's a raw set of keys to execute
         local countstr = count > 0 and count or ""
         local cmd = countstr .. action .. (pending_chars or "")
-        -- vim.cmd can't handle control and other special keys
-        -- vim.cmd("normal! "..cmd)
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n", false)
-    -- vim.notify("cmd " .. cmd)
+        vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
+        -- vim.notify("cmd " .. cmd) -- debugging
     elseif type(action) == "function" then
         -- add count to any repeated motion
         for _ = 1, math.max(count, 1) do
