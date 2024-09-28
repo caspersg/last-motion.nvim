@@ -41,11 +41,11 @@ M.register = function(def)
     -- add new keymaps
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     for _, key in ipairs(def.next_keys) do
-        vim.keymap.set("n", key, utils.remember(def, false), mapopts)
+        vim.keymap.set({ "n", "v" }, key, utils.remember(def, false), mapopts)
     end
     if def.prev_keys then
         for _, key in ipairs(def.prev_keys) do
-            vim.keymap.set("n", key, utils.remember(def, true), mapopts)
+            vim.keymap.set({ "n", "v" }, key, utils.remember(def, true), mapopts)
         end
     end
     -- print("last-motion registered " .. vim.inspect(def))
@@ -75,8 +75,8 @@ M.setup = function(opts)
     end
 
     -- TODO: extract these keymaps to config
-    vim.keymap.set("n", "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    vim.keymap.set("n", "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
+    vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
+    vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
 end
 
 return M
