@@ -7,23 +7,56 @@ local state = require("last-motion.state")
 local default_config = require("last-motion.config")
 
 local M = {}
-local config
 
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
---- register a new motion
+local function err(msg, def)
+    error(msg .. " " .. vim.inspect(def))
+end
+
+local function validate(def)
+    if not def.next or def.next == "" then
+        err("next is always required", def)
+    end
+    if def.prev ~= nil and def.prev == "" then
+        err("prev is optional but cannot be empty", def)
+    end
+    if def.desc ~= nil and def.desc == "" then
+        err("desc is optional but cannot be empty", def)
+    end
+    if def.command ~= nil and def.desc == "" then
+        err("command is optional but cannot be empty", def)
+    end
+    if def.pending ~= nil and type(def.pending) ~= "boolean" then
+        err("pending is optional but must be a boolean", def)
+    end
+    if def.next_keys ~= nil and type(def.next_keys) ~= "table" then
+        err("next_keys is optional but must be a table", def)
+    end
+    if def.prev_keys ~= nil and type(def.prev_keys) ~= "table" then
+        err("prev_keys is optional but must be a table", def)
+    end
+end
+
+local function register_command(def)
+    vim.api.nvim_create_autocmd("CmdlineLeave", {
+        group = group,
+        callback = function()
+            if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
+                -- call the closure immediately
+                utils.remember(def, false)()
+            end
+        end,
+    })
+end
+
+--- register a motion
 --- @param def table: the motion definition
 M.register = function(def)
+    validate(def)
+
     if def.command then
-        vim.api.nvim_create_autocmd("CmdlineLeave", {
-            group = group,
-            callback = function()
-                if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
-                    -- call the closure immediately
-                    utils.remember(def, false)()
-                end
-            end,
-        })
+        register_command(def)
         -- commands are a hook, so we don't need a new keymap
         return
     end
@@ -48,7 +81,7 @@ M.register = function(def)
             vim.keymap.set({ "n", "v" }, key, utils.remember(def, true), mapopts)
         end
     end
-    -- print("last-motion registered " .. vim.inspect(def))
+    -- vim.notify("last-motion registered " .. vim.inspect(def))
 end
 
 -- repeat the last motion
@@ -66,11 +99,11 @@ M.backward = function()
 end
 
 --- setup the plugin
----@param opts? table
+--- @param opts table: configuration options
 M.setup = function(opts)
-    -- TODO: allow overriding the defaults
-    config = default_config
-    for _, definition in ipairs(config.default_definitions) do
+    M.config = vim.tbl_deep_extend("force", default_config, opts or {})
+
+    for _, definition in ipairs(M.config.definitions) do
         M.register(definition)
     end
 

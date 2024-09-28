@@ -2,7 +2,7 @@ local search = require("last-motion.search")
 
 return {
     -- it doesn't matter which key in a pair is next or prev, as direction is preserved
-    default_definitions = {
+    definitions = {
         -- obvious ones
         { next = "h", prev = "l" },
         { next = "j", prev = "k" },
