@@ -12,7 +12,7 @@ local config
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
 --- register a new motion
---- @param def table
+--- @param def table: the motion definition
 M.register = function(def)
     if def.command then
         vim.api.nvim_create_autocmd("CmdlineLeave", {

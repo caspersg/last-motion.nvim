@@ -1,5 +1,5 @@
 local M = {
-    -- remember the last motion
+    --- State which stores the last motion, to be repeated
     last = nil,
 }
 
