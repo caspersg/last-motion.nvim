@@ -12,6 +12,7 @@ end
 --- @param action string|function: the exact keys for the motion or function to execute
 --- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
 M.exec = function(count, action, pending_chars)
+    -- TODO: does this all work with macros?
     if type(action) == "string" then
         -- Handle motion command
         local countstr = count > 0 and count or ""
@@ -42,23 +43,26 @@ M.remember = function(def, reverse)
             -- this motion has operator pending mode, so get those chars
             charstr = vim.fn.nr2char(vim.fn.getchar())
         end
-        state.last = {
+
+        -- maintain the current direction, so if moving backwards, next continues backwards
+        local forward = reverse and def.prev or def.next
+        local backward = reverse and def.next or def.prev
+
+        local last = state.update_last({
             count = count,
             charstr = charstr,
-            desc = def.desc, -- just for debugging
-            command = def.command, -- just for debugging
-            forward = def.next,
-            backward = def.prev,
-        }
-        if reverse then
-            -- maintain the current direction, so if moving backwards, next continues backwards
-            state.last.forward = def.prev
-            state.last.backward = def.next
-        end
+            forward = forward,
+            backward = backward,
 
-        if not def.command then
+            -- just for debugging
+            desc = def.desc,
+            command = def.command,
+            pending = def.pending,
+        })
+
+        if last and not def.command then
             -- commands are detected with hooks, so they've already been called
-            M.exec(state.last.count, state.last.forward, state.last.charstr)
+            M.exec(last.count, last.forward, last.charstr)
         end
     end
 end
