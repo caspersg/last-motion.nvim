@@ -62,14 +62,8 @@ M.register = function(def)
     end
 
     -- always add keymaps for existing keys
-    def.next_keys = def.next_keys or {}
-    def.prev_keys = def.prev_keys or {}
-    if type(def.next) == "string" then
-        table.insert(def.next_keys, def.next)
-    end
-    if type(def.prev) == "string" then
-        table.insert(def.prev_keys, def.prev)
-    end
+    def.next_keys = def.next_keys or ((type(def.next) == "string" and { def.next }) or {})
+    def.prev_keys = def.prev_keys or ((type(def.prev) == "string" and { def.prev }) or {})
 
     -- add new keymaps
     local mapopts = { desc = def.desc, noremap = true, silent = true }
