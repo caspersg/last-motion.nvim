@@ -81,14 +81,14 @@ end
 -- repeat the last motion
 M.forward = function()
     if state.last then
-        utils.exec(state.last.count, state.last.forward, state.last.charstr)
+        state.last.forward()
     end
 end
 
 -- repeat the last motion in reverse
 M.backward = function()
     if state.last then
-        utils.exec(state.last.count, state.last.backward, state.last.charstr)
+        state.last.backward()
     end
 end
 

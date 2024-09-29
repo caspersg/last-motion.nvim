@@ -7,20 +7,25 @@ M.notify_last_motion = function()
     vim.notify("last motion" .. vim.inspect(state.last))
 end
 
---- execute an action
+--- prepare an action to be executed
 --- @param count number: the count for the motion, 0 if there is no count
 --- @param action string|function: the exact keys for the motion or function to execute
 --- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
-M.exec = function(count, action, pending_chars)
+--- @return function: the closure to execute the action
+M.as_exec = function(count, action, pending_chars)
     if type(action) == "string" then -- it's a raw set of keys to execute
         local countstr = count > 0 and count or ""
         local cmd = countstr .. action .. (pending_chars or "")
-        vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
         -- vim.notify("cmd " .. cmd) -- debugging
+        return function()
+            vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
+        end
     elseif type(action) == "function" then
         -- add count to any repeated motion
-        for _ = 1, math.max(count, 1) do
-            action()
+        return function()
+            for _ = 1, math.max(count, 1) do
+                action()
+            end
         end
     else
         error("Invalid action type: " .. type(action))
@@ -33,6 +38,7 @@ end
 --- @return function: the closure to remember the motion
 M.remember = function(def, reverse)
     return function()
+        -- get surrounding context
         local count = vim.v.count
         local pending_chars = nil
         if def.pending then
@@ -47,8 +53,8 @@ M.remember = function(def, reverse)
         local last = state.update_last({
             count = count,
             charstr = pending_chars,
-            forward = forward,
-            backward = backward,
+            forward = M.as_exec(count, forward, pending_chars),
+            backward = M.as_exec(count, backward, pending_chars),
 
             -- just for debugging
             desc = def.desc,
@@ -56,17 +62,9 @@ M.remember = function(def, reverse)
             pending = def.pending,
         })
 
-        if type(forward) == "string" then -- it's a raw set of keys to execute
-            local countstr = count > 0 and count or ""
-            local cmd = countstr .. forward .. (pending_chars or "")
-            -- vim.fn.getreg("/")
-            -- , is an invalid register
-            local result = vim.fn.setreg("n", cmd, "c")
-        end
-
         if last and not def.command then
             -- commands are detected with hooks, so they've already been called
-            M.exec(last.count, last.forward, last.charstr)
+            last.forward()
         end
     end
 end
