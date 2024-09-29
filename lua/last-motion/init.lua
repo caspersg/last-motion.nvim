@@ -44,7 +44,7 @@ local function register_command(def)
         callback = function()
             if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
                 -- call the closure immediately
-                utils.remember(def, false)()
+                utils.remember(def.command, def, false)()
             end
         end,
     })
@@ -68,11 +68,11 @@ M.register = function(def)
     -- add new keymaps
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     for _, key in ipairs(def.next_keys) do
-        vim.keymap.set({ "n", "v" }, key, utils.remember(def, false), mapopts)
+        vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, false), mapopts)
     end
     if def.prev_keys then
         for _, key in ipairs(def.prev_keys) do
-            vim.keymap.set({ "n", "v" }, key, utils.remember(def, true), mapopts)
+            vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, true), mapopts)
         end
     end
     -- vim.notify("last-motion registered " .. vim.inspect(def))

@@ -3,7 +3,7 @@
 --- @field pending_chars string: the character string following the motion
 --- @field forward function: to repeat motion
 --- @field backward function: to repeat motion in reverse
---- @field desc string: the description of the motion
+--- @field name string: the description of the motion
 --- @field command string: the command of the motion
 --- @field pending boolean: if the motion is pending
 --- @field searching boolean: if the motion is a search type motion
@@ -20,11 +20,19 @@ function Motion.new(opts)
     new.backward = opts.backward
 
     -- debugging
-    new.desc = opts.desc
+    new.name = opts.name
     new.command = opts.command
     new.pending = opts.pending
 
     return new
+end
+
+function Motion:display()
+    local count = ""
+    if self.count > 0 then
+        count = "" .. self.count
+    end
+    return string.format("%s%s%s", count, self.name, self.pending_chars or "")
 end
 
 return Motion
