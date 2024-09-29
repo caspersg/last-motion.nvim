@@ -1,46 +1,38 @@
 -- helpers to reproduce the original search behaviour for / ? * #
 local state = require("last-motion.state")
 
-local M = {
-    -- FIXME: make this work with history
-}
+local M = {}
 
-local function set_last_search()
-    state.last().last_search = vim.fn.getreg("/")
+local function set_searching()
+    if state.last() then
+        -- store this on last, as it automatically gets reset
+        state.last().searching = true
+    end
 end
 
-local function find_last_search()
-    if state.last().last_search then
-        return vim.fn.getreg("/")
-    end
-    return nil
+local function is_searching()
+    return state.last() and state.last().searching
 end
 
 --- The same as default behaviour of * and n/N, but in one function
 M.next_search = function()
-    local last_search = find_last_search()
-    if last_search then
-        -- use the last search, not a new one
-        vim.fn.search(last_search)
-        vim.opt.hlsearch = true
+    if is_searching() then
+        M.next_for_recent_search()
     else
         -- a new search since we have a fresh state.last value
         vim.cmd("normal! *")
-        set_last_search()
+        set_searching()
     end
 end
 
 --- The same as default behaviour of # and n/N, but in one function
 M.prev_search = function()
-    local last_search = find_last_search()
-    if last_search then
-        -- use the last search, not a new one
-        vim.fn.search(last_search, "b")
-        vim.opt.hlsearch = true
+    if is_searching() then
+        M.prev_for_recent_search()
     else
         -- a new search since we have a fresh state.last value
         vim.cmd("normal! #")
-        set_last_search()
+        set_searching()
     end
 end
 
@@ -52,7 +44,6 @@ M.next_for_recent_search = function()
     if not recent_search then
         return
     end
-    set_last_search()
     vim.fn.search(recent_search)
     vim.opt.hlsearch = true
 end
@@ -63,7 +54,6 @@ M.prev_for_recent_search = function()
     if not recent_search then
         return
     end
-    set_last_search()
     vim.fn.search(recent_search, "b")
     vim.opt.hlsearch = true
 end
