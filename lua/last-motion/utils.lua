@@ -17,8 +17,15 @@ M.as_exec = function(count, action, pending_chars)
         local countstr = count > 0 and count or ""
         local cmd = countstr .. action .. (pending_chars or "")
         -- vim.notify("cmd " .. cmd) -- debugging
-        return function()
-            vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
+        if string.find(action, "<C%-i>") then
+            return function()
+                -- C-i is a special case, it's the same as tab, so it requires feedkeys
+                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n", true)
+            end
+        else
+            return function()
+                vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
+            end
         end
     elseif type(action) == "function" then
         -- add count to any repeated motion
