@@ -1,0 +1,47 @@
+-- helpers to reproduce the original search behaviour for / ? * #
+
+local M = {}
+
+local state = require("last-motion.state")
+
+--- The same as default behaviour of * and n/N, but in one function
+M.next_search = function()
+    if state.last.search then
+        -- use the last search, not a new one
+        vim.fn.search(state.last.search)
+    else
+        -- a new search since we have a fresh state.last value
+        vim.cmd("normal! *")
+        state.last.search = vim.fn.getreg("/")
+    end
+end
+
+--- The same as default behaviour of # and n/N, but in one function
+M.prev_search = function()
+    if state.last.search then
+        -- use the last search, not a new one
+        vim.fn.search(state.last.search, "b")
+    else
+        -- a new search since we have a fresh state.last value
+        vim.cmd("normal! #")
+        state.last.search = vim.fn.getreg("/")
+    end
+end
+
+--- Any movement after a search will override state.last, so that search is forgotten and highlights may be off.
+--- So we need a way to get back whatever the most recent search was, and continue through results.
+--- The last count is lost, but you can add count to this keymap.
+M.next_for_recent_search = function()
+    state.last.search = vim.fn.getreg("/")
+    vim.fn.search(state.last.search)
+    vim.opt.hlsearch = true
+end
+
+--- Same as next_for_recent_search, but in reverse direction.
+M.prev_for_recent_search = function()
+    state.last.search = vim.fn.getreg("/")
+    vim.fn.search(state.last.search, "b")
+    vim.opt.hlsearch = true
+end
+
+return M
