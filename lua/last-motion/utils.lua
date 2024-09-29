@@ -34,10 +34,10 @@ end
 M.remember = function(def, reverse)
     return function()
         local count = vim.v.count
-        local charstr = nil
+        local pending_chars = nil
         if def.pending then
             -- this motion has operator pending mode, so get those chars
-            charstr = vim.fn.nr2char(vim.fn.getchar())
+            pending_chars = vim.fn.nr2char(vim.fn.getchar())
         end
 
         -- maintain the current direction, so if moving backwards, next continues backwards
@@ -46,7 +46,7 @@ M.remember = function(def, reverse)
 
         local last = state.update_last({
             count = count,
-            charstr = charstr,
+            charstr = pending_chars,
             forward = forward,
             backward = backward,
 
@@ -55,6 +55,14 @@ M.remember = function(def, reverse)
             command = def.command,
             pending = def.pending,
         })
+
+        if type(forward) == "string" then -- it's a raw set of keys to execute
+            local countstr = count > 0 and count or ""
+            local cmd = countstr .. forward .. (pending_chars or "")
+            -- vim.fn.getreg("/")
+            -- , is an invalid register
+            local result = vim.fn.setreg("n", cmd, "c")
+        end
 
         if last and not def.command then
             -- commands are detected with hooks, so they've already been called
