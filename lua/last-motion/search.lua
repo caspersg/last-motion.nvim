@@ -10,10 +10,8 @@ local function set_last_search()
 end
 
 local function find_last_search()
-    for _, value in ipairs(state.history) do
-        if value.last_search then
-            return value.last_search
-        end
+    if state.last().last_search then
+        return vim.fn.getreg("/")
     end
     return nil
 end
@@ -24,6 +22,7 @@ M.next_search = function()
     if last_search then
         -- use the last search, not a new one
         vim.fn.search(last_search)
+        vim.opt.hlsearch = true
     else
         -- a new search since we have a fresh state.last value
         vim.cmd("normal! *")
@@ -37,6 +36,7 @@ M.prev_search = function()
     if last_search then
         -- use the last search, not a new one
         vim.fn.search(last_search, "b")
+        vim.opt.hlsearch = true
     else
         -- a new search since we have a fresh state.last value
         vim.cmd("normal! #")
@@ -48,23 +48,23 @@ end
 --- So we need a way to get back whatever the most recent search was, and continue through results.
 --- The last count is lost, but you can add count to this keymap.
 M.next_for_recent_search = function()
-    local last_search = find_last_search()
-    if not last_search then
+    local recent_search = vim.fn.getreg("/")
+    if not recent_search then
         return
     end
     set_last_search()
-    vim.fn.search(last_search)
+    vim.fn.search(recent_search)
     vim.opt.hlsearch = true
 end
 
 --- Same as next_for_recent_search, but in reverse direction.
 M.prev_for_recent_search = function()
-    local last_search = find_last_search()
-    if not last_search then
+    local recent_search = vim.fn.getreg("/")
+    if not recent_search then
         return
     end
     set_last_search()
-    vim.fn.search(last_search, "b")
+    vim.fn.search(recent_search, "b")
     vim.opt.hlsearch = true
 end
 
