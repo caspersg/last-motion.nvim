@@ -129,6 +129,7 @@ M.setup = function(opts)
     end
 
     vim.api.nvim_create_user_command("LastMotions", state.print_last_motions, {})
+    vim.keymap.set("n", ",,", state.print_last_motions, { desc = "last motions", noremap = true, silent = true })
 end
 
 return M
