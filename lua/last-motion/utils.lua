@@ -59,7 +59,7 @@ M.remember = function(def, reverse)
 
         local last = state.update_last({
             count = count,
-            charstr = pending_chars,
+            pending_chars = pending_chars,
             forward = M.as_exec(count, forward, pending_chars),
             backward = M.as_exec(count, backward, pending_chars),
 

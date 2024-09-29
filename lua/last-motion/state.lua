@@ -1,29 +1,13 @@
 local M = {
-    --- State which stores the last motion, to be repeated
+    --- State which stores the last motions, to be repeated
     history = {},
 }
 
-local Last = {}
-Last.__index = Last
+local Motion = require("last-motion.motion")
 
-function Last.new(opts)
-    local new = setmetatable({}, Last)
-
-    new.count = opts.count
-    new.charstr = opts.charstr
-    new.forward = opts.forward
-    new.backward = opts.backward
-
-    -- debugging
-    new.desc = opts.desc
-    new.command = opts.command
-    new.pending = opts.pending
-
-    return new
-end
-
+--- update the last motion
 M.update_last = function(opts)
-    local new_motion = Last.new(opts)
+    local new_motion = Motion.new(opts)
 
     table.insert(M.history, 1, new_motion)
 
@@ -33,13 +17,25 @@ M.update_last = function(opts)
     return new_motion
 end
 
+--- get the most recent motion
+--- @return Motion: the most recent motion
 M.last = function()
-    return M.history[1]
+    return M.get(0)
 end
 
+--- get the nth motion, 0 is the most recent, 9 is the oldest
+--- @param offset number: the offset from the most recent motion
+--- @return Motion: the motion at the offset
 M.get = function(offset)
     local index = offset + 1
     return M.history[index]
+end
+
+--- Function to print the latest 10 motions
+M.print_last_motions = function()
+    for i, motion in ipairs(M.history) do
+        print(string.format("Motion %d: %s", i, vim.inspect(motion)))
+    end
 end
 
 return M

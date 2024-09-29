@@ -127,6 +127,8 @@ M.setup = function(opts)
             M.nth(i)
         end, { desc = "repeat motion" .. i, noremap = true, silent = true })
     end
+
+    vim.api.nvim_create_user_command("LastMotions", state.print_last_motions, {})
 end
 
 return M
