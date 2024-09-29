@@ -80,20 +80,20 @@ end
 
 -- repeat the last motion
 M.forward = function()
-    if state.last then
+    if state.last() then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last.forward()
+            state.last().forward()
         end
     end
 end
 
 -- repeat the last motion in reverse
 M.backward = function()
-    if state.last then
+    if state.last() then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last.backward()
+            state.last().backward()
         end
     end
 end

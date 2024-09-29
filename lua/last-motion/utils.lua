@@ -4,7 +4,7 @@ local state = require("last-motion.state")
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()
-    vim.notify("last motion" .. vim.inspect(state.last))
+    vim.notify("last motion" .. vim.inspect(state.last()))
 end
 
 --- prepare an action to be executed

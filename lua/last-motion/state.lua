@@ -1,6 +1,6 @@
 local M = {
     --- State which stores the last motion, to be repeated
-    last = nil,
+    history = {},
 }
 
 local Last = {}
@@ -23,8 +23,18 @@ function Last.new(opts)
 end
 
 M.update_last = function(opts)
-    M.last = Last.new(opts)
-    return M.last
+    local new_motion = Last.new(opts)
+
+    table.insert(M.history, 1, new_motion)
+
+    if #M.history > 10 then
+        table.remove(M.history)
+    end
+    return new_motion
+end
+
+M.last = function()
+    return M.history[1]
 end
 
 return M
