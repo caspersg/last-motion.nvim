@@ -37,4 +37,9 @@ M.last = function()
     return M.history[1]
 end
 
+M.get = function(offset)
+    local index = offset + 1
+    return M.history[index]
+end
+
 return M

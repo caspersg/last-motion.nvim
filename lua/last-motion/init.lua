@@ -98,6 +98,17 @@ M.backward = function()
     end
 end
 
+-- repeat motion at offset, 0 is more recent, 9 is oldest
+M.nth = function(offset)
+    local motion = state.get(offset)
+    if motion then
+        local count = vim.v.count
+        for _ = 1, math.max(count, 1) do
+            motion.forward()
+        end
+    end
+end
+
 --- setup the plugin
 --- @param opts table: configuration options
 M.setup = function(opts)
@@ -110,6 +121,12 @@ M.setup = function(opts)
     -- TODO: extract these keymaps to config
     vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
     vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
+
+    for i = 0, 9 do
+        vim.keymap.set({ "n", "v" }, "," .. i, function()
+            M.nth(i)
+        end, { desc = "repeat motion" .. i, noremap = true, silent = true })
+    end
 end
 
 return M

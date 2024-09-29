@@ -3,6 +3,7 @@
 local M = {
     --- State which stores the last motion, to be repeated
     last_search = nil,
+    -- FIXME: make this work with history
 }
 
 local function set_last_search()
@@ -11,7 +12,7 @@ end
 
 --- The same as default behaviour of * and n/N, but in one function
 M.next_search = function()
-    if M.last and M.last_search then
+    if M.last_search then
         -- use the last search, not a new one
         vim.fn.search(M.last_search)
     else
@@ -23,7 +24,7 @@ end
 
 --- The same as default behaviour of # and n/N, but in one function
 M.prev_search = function()
-    if M.last and M.last_search then
+    if M.last_search then
         -- use the last search, not a new one
         vim.fn.search(M.last_search, "b")
     else
