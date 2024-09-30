@@ -4,7 +4,7 @@ local state = require("last-motion.state")
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()
-    vim.notify("last motion" .. vim.inspect(state.last))
+    vim.notify("last motion" .. vim.inspect(state.last()))
 end
 
 --- prepare an action to be executed
@@ -40,10 +40,11 @@ M.as_exec = function(count, action, pending_chars)
 end
 
 --- remember this motion so it can be repeated
+--- @param key string: the key that triggered the motion
 --- @param def table: the motion definition
 --- @param reverse boolean: if true, the motion is reversed
 --- @return function: the closure to remember the motion
-M.remember = function(def, reverse)
+M.remember = function(key, def, reverse)
     return function()
         -- get surrounding context
         local count = vim.v.count
@@ -59,12 +60,11 @@ M.remember = function(def, reverse)
 
         local last = state.update_last({
             count = count,
-            charstr = pending_chars,
+            pending_chars = pending_chars,
             forward = M.as_exec(count, forward, pending_chars),
             backward = M.as_exec(count, backward, pending_chars),
 
-            -- just for debugging
-            desc = def.desc,
+            name = key,
             command = def.command,
             pending = def.pending,
         })

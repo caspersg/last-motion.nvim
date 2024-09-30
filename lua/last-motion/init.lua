@@ -44,7 +44,7 @@ local function register_command(def)
         callback = function()
             if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
                 -- call the closure immediately
-                utils.remember(def, false)()
+                utils.remember(def.command, def, false)()
             end
         end,
     })
@@ -68,11 +68,11 @@ M.register = function(def)
     -- add new keymaps
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     for _, key in ipairs(def.next_keys) do
-        vim.keymap.set({ "n", "v" }, key, utils.remember(def, false), mapopts)
+        vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, false), mapopts)
     end
     if def.prev_keys then
         for _, key in ipairs(def.prev_keys) do
-            vim.keymap.set({ "n", "v" }, key, utils.remember(def, true), mapopts)
+            vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, true), mapopts)
         end
     end
     -- vim.notify("last-motion registered " .. vim.inspect(def))
@@ -80,22 +80,45 @@ end
 
 -- repeat the last motion
 M.forward = function()
-    if state.last then
+    if state.last() then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last.forward()
+            state.last().forward()
         end
     end
 end
 
 -- repeat the last motion in reverse
 M.backward = function()
-    if state.last then
+    if state.last() then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last.backward()
+            state.last().backward()
         end
     end
+end
+
+-- repeat motion at offset, 0 is more recent, 9 is oldest
+-- @param offset number: the offset into the history
+M.nth = function(offset)
+    local motion = state.get(offset)
+    if motion then
+        local count = vim.v.count
+        for _ = 1, math.max(count, 1) do
+            motion.forward()
+        end
+    end
+end
+
+--- get the latest 10 motions
+--- @return string: the motions each on a new line
+M.get_last_motions = function()
+    local lines = {}
+    for i, motion in ipairs(state.history) do
+        table.insert(lines, string.format("%d:%s", i - 1, motion:display()))
+    end
+
+    return table.concat(lines, "\n")
 end
 
 --- setup the plugin
@@ -103,13 +126,29 @@ end
 M.setup = function(opts)
     M.config = vim.tbl_deep_extend("force", default_config, opts or {})
 
+    state.max_motions = M.config.max_motions
+
     for _, definition in ipairs(M.config.definitions) do
         M.register(definition)
     end
 
-    -- TODO: extract these keymaps to config
-    vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
+    vim.api.nvim_create_user_command("LastMotions", function()
+        vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
+    end, {})
+
+    -- Add these yourself
+    -- vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
+    -- vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
+    --
+    -- for i = 0, 9 do
+    --     vim.keymap.set({ "n", "v" }, "," .. i, function()
+    --         M.nth(i)
+    --     end, { desc = "repeat motion" .. i, noremap = true, silent = true })
+    -- end
+    --
+    -- vim.keymap.set("n", ",,", function()
+    --     vim.notify(M.print_last_motions, vim.log.levels.INFO, { title = "Last Motions" })
+    -- end, { desc = "last motions", noremap = true, silent = true })
 end
 
 return M
