@@ -7,7 +7,7 @@
 --- @field next_key? string: the key for forward action, overrides next as the action
 --- @field prev_key? string: the key for backward action, overrides prev as the action
 --- @field pending? boolean: if the motion is operator pending, key will wait for keys after the motion
---- @field command? string: the key for the command, if it is a command like /
+--- @field command? string: the key for the command, if it is a command like /. commands don't get a new keymap
 local Definition = {}
 Definition.__index = Definition
 

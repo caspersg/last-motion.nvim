@@ -14,32 +14,44 @@ local group = vim.api.nvim_create_augroup("last-motion", {})
 --- register a command
 --- @param def Definition: a command definition
 local function register_command(def)
+    local next = utils.remember(def.command, def, false)
+    local prev = utils.remember(def.command, def, true)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
         group = group,
         callback = function()
             if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
                 -- call the closure immediately
-                utils.remember(def.command, def, false)()
+                next()
             end
         end,
     })
+    return {
+        next = next,
+        prev = prev,
+    }
 end
 
 --- register a motion
 --- @param def Definition: a motion definition
+--- @return table: next and prev functions which can be used in keymaps
 M.register = function(def)
     if def.command then
-        register_command(def)
+        return register_command(def)
         -- commands are a hook, so we don't need a new keymap
-        return
     end
 
     -- add new keymaps, these are required to replace existing behaviour
     -- this is how motions are remembered
     local mapopts = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next, utils.remember(def.next, def, false), mapopts)
-    vim.keymap.set({ "n", "v" }, def.prev, utils.remember(def.prev, def, true), mapopts)
+    local remembered_next = utils.remember(def.next, def, false)
+    local remembered_prev = utils.remember(def.prev, def, true)
+    vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
+    vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
     -- vim.notify("last-motion registered " .. vim.inspect(def))
+    return {
+        next = remembered_next,
+        prev = remembered_prev,
+    }
 end
 
 -- repeat the last motion
