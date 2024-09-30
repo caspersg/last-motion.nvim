@@ -119,17 +119,18 @@ M.setup = function(opts)
     end, {})
 
     -- Add these yourself
-    -- vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    -- vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
+    -- local lm = require("last-motion")
+    -- vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
+    -- vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
     --
     -- for i = 0, 9 do
-    --     vim.keymap.set({ "n", "v" }, "," .. i, function()
-    --         M.nth(i)
-    --     end, { desc = "repeat motion" .. i, noremap = true, silent = true })
+    --   vim.keymap.set({ "n", "v" }, "," .. i, function()
+    --     lm.nth(i)
+    --   end, { desc = "repeat " .. i, noremap = true, silent = true })
     -- end
     --
     -- vim.keymap.set("n", ",,", function()
-    --     vim.notify(M.print_last_motions, vim.log.levels.INFO, { title = "Last Motions" })
+    --   vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     -- end, { desc = "last motions", noremap = true, silent = true })
 end
 
