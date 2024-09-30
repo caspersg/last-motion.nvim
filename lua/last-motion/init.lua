@@ -46,7 +46,7 @@ M.register = function(def, skip_keymaps)
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     local remembered_next = utils.remember(def.next, def, false)
     local remembered_prev = utils.remember(def.prev, def, true)
-    if skip_keymaps then
+    if not skip_keymaps then
         vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
         vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
     end
