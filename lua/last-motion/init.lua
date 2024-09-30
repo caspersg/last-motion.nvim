@@ -30,11 +30,11 @@ local function validate(def)
     if def.pending ~= nil and type(def.pending) ~= "boolean" then
         err("pending is optional but must be a boolean", def)
     end
-    if def.next_keys ~= nil and type(def.next_keys) ~= "table" then
-        err("next_keys is optional but must be a table", def)
+    if def.next_key ~= nil and type(def.next_key) ~= "string" then
+        err("next_key is optional but must be a string", def)
     end
-    if def.prev_keys ~= nil and type(def.prev_keys) ~= "table" then
-        err("prev_keys is optional but must be a table", def)
+    if def.prev_key ~= nil and type(def.prev_key) ~= "string" then
+        err("prev_key is optional but must be a string", def)
     end
 end
 
@@ -62,18 +62,14 @@ M.register = function(def)
     end
 
     -- always add keymaps for existing keys
-    def.next_keys = def.next_keys or ((type(def.next) == "string" and { def.next }) or {})
-    def.prev_keys = def.prev_keys or ((type(def.prev) == "string" and { def.prev }) or {})
+    def.next_key = def.next_key or ((type(def.next) == "string" and def.next) or nil)
+    def.prev_key = def.prev_key or ((type(def.prev) == "string" and def.prev) or nil)
 
     -- add new keymaps
     local mapopts = { desc = def.desc, noremap = true, silent = true }
-    for _, key in ipairs(def.next_keys) do
-        vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, false), mapopts)
-    end
-    if def.prev_keys then
-        for _, key in ipairs(def.prev_keys) do
-            vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, true), mapopts)
-        end
+    vim.keymap.set({ "n", "v" }, def.next_key, utils.remember(def.next_key, def, false), mapopts)
+    if def.prev_key then
+        vim.keymap.set({ "n", "v" }, def.prev_key, utils.remember(def.prev_key, def, true), mapopts)
     end
     -- vim.notify("last-motion registered " .. vim.inspect(def))
 end
