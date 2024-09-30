@@ -31,17 +31,4 @@ M.get = function(offset)
     return M.history[index]
 end
 
---- Function to print the latest 10 motions
-M.print_last_motions = function()
-    -- vim.cmd("enew")
-    -- local buf = vim.api.nvim_get_current_buf()
-
-    local lines = {}
-    for i, motion in ipairs(M.history) do
-        table.insert(lines, string.format("%d:%s", i - 1, motion:display()))
-    end
-
-    vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "Last Motions" })
-end
-
 return M
