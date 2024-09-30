@@ -126,6 +126,8 @@ end
 M.setup = function(opts)
     M.config = vim.tbl_deep_extend("force", default_config, opts or {})
 
+    state.max_motions = M.config.max_motions
+
     for _, definition in ipairs(M.config.definitions) do
         M.register(definition)
     end

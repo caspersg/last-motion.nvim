@@ -1,17 +1,19 @@
 local M = {
     --- State which stores the last motions, to be repeated
     history = {},
+    max_motions = nil,
 }
 
 local Motion = require("last-motion.motion")
 
 --- update the last motion
-M.update_last = function(opts)
-    local new_motion = Motion.new(opts)
+--- @param motion Motion: the motion to remember
+M.update_last = function(motion)
+    local new_motion = Motion.new(motion)
 
     table.insert(M.history, 1, new_motion)
 
-    if #M.history > 10 then
+    if #M.history > M.max_motions then
         table.remove(M.history)
     end
     return new_motion

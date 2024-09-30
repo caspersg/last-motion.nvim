@@ -1,6 +1,7 @@
 local search = require("last-motion.search")
 
 return {
+    max_motions = 10,
     -- it doesn't matter which key in a pair is next or prev, as direction is preserved
     definitions = {
         -- obvious ones
