@@ -57,58 +57,58 @@ return {
             prev = search.prev_search,
         },
         {
-            -- adds being able to get back to recent search results after other movements
+            -- adds key to get back to recent search results after other movements
+            -- this is needed if you override n and N with repeating motions
             desc = "recent [s]earch",
-            next_keys = { ",s" },
-            prev_keys = { ",S" },
+            next_keys = { "]s", ",s" },
+            prev_keys = { "[s", ",S" },
             next = search.next_for_recent_search,
             prev = search.prev_for_recent_search,
         },
 
         {
             desc = "[d]iagnostic",
-            next_keys = { ",d", "]d" },
-            prev_keys = { ",D", "[d" },
+            next_keys = { "]d", ",d" },
+            prev_keys = { "[d", ",D" },
             next = vim.diagnostic.goto_next,
             prev = vim.diagnostic.goto_prev,
         },
         {
             desc = "fo[l]d",
-            next_keys = { ",l" },
-            prev_keys = { ",L" },
+            next_keys = { "]l", ",l" },
+            prev_keys = { "[l", ",L" },
             next = "zj",
             prev = "zk",
         },
 
         {
             desc = "[w]indow",
-            next_keys = { ",w" },
-            prev_keys = { ",W" },
+            next_keys = { "]w", ",w" },
+            prev_keys = { "[w", ",W" },
             next = "<C-w>w",
             prev = "<C-w>W",
         },
 
         {
             desc = "[q]uickfix item",
-            next_keys = { ",q" },
-            prev_keys = { ",Q" },
+            next_keys = { "]q", ",q" },
+            prev_keys = { "[q", ",Q" },
             next = vim.cmd.cnext,
             prev = vim.cmd.cprevious,
         },
 
-        -- I use bufferline specific commands instead
-        -- {
-        --   desc = "[b]uffer",
-        --   next_keys = { ",b", "]b" },
-        --   prev_keys = { ",B", "[b" },
-        --   next = vim.cmd.bnext,
-        --   prev = vim.cmd.bprevious,
-        -- },
+        {
+            desc = "[b]uffer",
+            next_keys = { "]b", ",b" },
+            prev_keys = { "[b", ",B" },
+            next = vim.cmd.bnext,
+            prev = vim.cmd.bprevious,
+        },
 
         {
             desc = "[t]ab",
-            next_keys = { ",t", "]t" },
-            prev_keys = { ",T", "[t" },
+            next_keys = { "]t", ",t" },
+            prev_keys = { "[t", ",T" },
             next = vim.cmd.tabnext,
             prev = vim.cmd.tabprevious,
         },
@@ -117,96 +117,96 @@ return {
 
         {
             desc = "[a]ttribute",
-            next_keys = { ",ta" },
-            prev_keys = { ",tA" },
+            next_keys = { "]a", ",ta" },
+            prev_keys = { "[a", ",tA" },
             next = ts_next("@attribute.inner"),
             prev = ts_prev("@attribute.inner"),
         },
 
         {
-            desc = "fra[m]e",
-            next_keys = { ",tm" },
-            prev_keys = { ",tM" },
+            desc = "fram[e]",
+            next_keys = { "]e", ",te" },
+            prev_keys = { "[e", ",tE" },
             next = ts_next("@frame.inner"),
             prev = ts_prev("@frame.inner"),
         },
 
         {
             desc = "c[o]mment",
-            next_keys = { ",to" },
-            prev_keys = { ",tO" },
+            next_keys = { "]o", ",to" },
+            prev_keys = { "[o", ",tO" },
             next = ts_next("@comment.outer"),
             prev = ts_prev("@comment.outer"),
         },
 
         {
-            desc = "[b]lock",
-            next_keys = { ",tb" },
-            prev_keys = { ",tB" },
+            desc = "bloc[k]",
+            next_keys = { "]k", ",tk" },
+            prev_keys = { "[k", ",tK" },
             next = ts_next("@block.inner"),
             prev = ts_prev("@block.inner"),
         },
 
         {
             desc = "[r]eturn",
-            next_keys = { ",tr" },
-            prev_keys = { ",tB" },
+            next_keys = { "]r", ",tr" },
+            prev_keys = { "[r", ",tR" },
             next = ts_next("@return.inner"),
             prev = ts_prev("@return.inner"),
         },
 
         {
             desc = "[p]arameter",
-            next_keys = { ",tp" },
-            prev_keys = { ",tP" },
+            next_keys = { "]p", ",tp" },
+            prev_keys = { "[p", ",tP" },
             next = ts_next("@parameter.inner"),
             prev = ts_prev("@parameter.inner"),
         },
 
         {
-            desc = "ca[l]l",
-            next_keys = { ",tl" },
-            prev_keys = { ",tL" },
+            desc = "[c]all",
+            next_keys = { "]c", ",tl" },
+            prev_keys = { "[c", ",tL" },
             next = ts_next("@call.outer"),
             prev = ts_prev("@call.outer"),
         },
 
         {
             desc = "[a]ssignment",
-            next_keys = { ",ta" },
-            prev_keys = { ",tA" },
+            next_keys = { "]a", ",ta" },
+            prev_keys = { "[a", ",tA" },
             next = ts_next("@assignment.rhs"),
             prev = ts_prev("@assignment.rhs"),
         },
 
         {
-            desc = "con[d]itional",
-            next_keys = { ",td" },
-            prev_keys = { ",tD" },
+            desc = "co[N]ditional",
+            next_keys = { "]N", ",tn" },
+            prev_keys = { "[N", ",tN" },
             next = ts_next("@conditional.inner"),
             prev = ts_prev("@conditional.inner"),
         },
 
         {
-            desc = "[c]lass",
-            next_keys = { ",tc" },
-            prev_keys = { ",tC" },
+            desc = "[C]lass",
+            next_keys = { "]C", ",tc" },
+            prev_keys = { "[C", ",tC" },
             next = ts_next("@class.inner"),
             prev = ts_prev("@class.inner"),
         },
 
         {
             desc = "[f]unction",
-            next_keys = { ",tf" },
-            prev_keys = { ",tF" },
+            next_keys = { "]f", ",tf" },
+            prev_keys = { "[f", ",tF" },
             next = ts_next("@function.outer"),
             prev = ts_prev("@function.outer"),
         },
 
         {
             desc = "[n]ode",
-            next_keys = { ",tn" },
-            prev_keys = { ",tN" },
+            next_keys = { "]n", ",tn" },
+            prev_keys = { "[n", ",tN" },
             next = function()
                 local node = ts_utils.get_node_at_cursor()
                 if node == nil then
