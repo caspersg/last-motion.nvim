@@ -4,52 +4,15 @@
 
 local utils = require("last-motion.utils")
 local state = require("last-motion.state")
+local Definition = require("last-motion.definition")
 local default_config = require("last-motion.config")
 
 local M = {}
 
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
-local function err(msg, def)
-    error(msg .. " " .. vim.inspect(def))
-end
-
-local function validate(def)
-    if not def.next or def.next == "" then
-        err("next is always required", def)
-    end
-    if def.prev ~= nil and def.prev == "" then
-        err("prev is optional but cannot be empty", def)
-    end
-    if def.desc ~= nil and def.desc == "" then
-        err("desc is optional but cannot be empty", def)
-    end
-    if def.command ~= nil and def.desc == "" then
-        err("command is optional but cannot be empty", def)
-    end
-    if def.pending ~= nil and type(def.pending) ~= "boolean" then
-        err("pending is optional but must be a boolean", def)
-    end
-    if def.next_key ~= nil and type(def.next_key) ~= "string" then
-        err("next_key is optional but must be a string", def)
-    end
-    if def.prev_key ~= nil and type(def.prev_key) ~= "string" then
-        err("prev_key is optional but must be a string", def)
-    end
-    if def.next_func ~= nil and type(def.next_func) ~= "function" then
-        err("next_func is optional but must be a function", def)
-    end
-    if def.prev_func ~= nil and type(def.prev_func) ~= "function" then
-        err("prev_func is optional but must be a function", def)
-    end
-    if def.next_func and def.next_key then
-        err("cannot have both next_func and next_key", def)
-    end
-    if def.prev_func and def.prev_key then
-        err("cannot have both prev_func and prev_key", def)
-    end
-end
-
+--- register a command
+--- @param def Definition: a command definition
 local function register_command(def)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
         group = group,
@@ -63,10 +26,8 @@ local function register_command(def)
 end
 
 --- register a motion
---- @param def table: the motion definition
+--- @param def Definition: a motion definition
 M.register = function(def)
-    validate(def)
-
     if def.command then
         register_command(def)
         -- commands are a hook, so we don't need a new keymap
@@ -77,9 +38,7 @@ M.register = function(def)
     -- this is how motions are remembered
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     vim.keymap.set({ "n", "v" }, def.next, utils.remember(def.next, def, false), mapopts)
-    if def.prev then
-        vim.keymap.set({ "n", "v" }, def.prev, utils.remember(def.prev, def, true), mapopts)
-    end
+    vim.keymap.set({ "n", "v" }, def.prev, utils.remember(def.prev, def, true), mapopts)
     -- vim.notify("last-motion registered " .. vim.inspect(def))
 end
 
@@ -133,8 +92,8 @@ M.setup = function(opts)
 
     state.max_motions = M.config.max_motions
 
-    for _, definition in ipairs(M.config.definitions) do
-        M.register(definition)
+    for _, def in ipairs(M.config.definitions) do
+        M.register(Definition.new(def))
     end
 
     vim.api.nvim_create_user_command("LastMotionsNotify", function()
