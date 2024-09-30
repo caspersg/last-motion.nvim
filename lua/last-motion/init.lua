@@ -132,7 +132,7 @@ M.setup = function(opts)
         M.register(definition)
     end
 
-    vim.api.nvim_create_user_command("LastMotions", function()
+    vim.api.nvim_create_user_command("LastMotionsNotify", function()
         vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     end, {})
 
