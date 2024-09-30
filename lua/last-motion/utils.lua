@@ -1,6 +1,20 @@
 local M = {}
 
 local state = require("last-motion.state")
+local ts_utils = require("nvim-treesitter.ts_utils")
+local ts_move = require("nvim-treesitter.textobjects.move")
+
+M.ts_next = function(query)
+    return function()
+        ts_move.goto_next_start(query)
+    end
+end
+
+M.ts_prev = function(query)
+    return function()
+        ts_move.goto_previous_start(query)
+    end
+end
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()

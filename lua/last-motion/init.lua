@@ -117,21 +117,6 @@ M.setup = function(opts)
     vim.api.nvim_create_user_command("LastMotionsNotify", function()
         vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     end, {})
-
-    -- Add these yourself
-    -- local lm = require("last-motion")
-    -- vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    -- vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
-    --
-    -- for i = 0, 9 do
-    --   vim.keymap.set({ "n", "v" }, "," .. i, function()
-    --     lm.nth(i)
-    --   end, { desc = "repeat " .. i, noremap = true, silent = true })
-    -- end
-    --
-    -- vim.keymap.set("n", ",,", function()
-    --   vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
-    -- end, { desc = "last motions", noremap = true, silent = true })
 end
 
 return M

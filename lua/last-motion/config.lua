@@ -1,20 +1,9 @@
 local search = require("last-motion.search")
-local ts_utils = require("nvim-treesitter.ts_utils")
-local ts_move = require("nvim-treesitter.textobjects.move")
-
-local function ts_next(query)
-    return function()
-        ts_move.goto_next_start(query)
-    end
-end
-
-local function ts_prev(query)
-    return function()
-        ts_move.goto_previous_start(query)
-    end
-end
+local ts_utils = require("nvim-treesitter.ts_utils") -- from nvim-treesitter/nvim-treesitter-textobjects
+local utils = require("last-motion.utils")
 
 return {
+    -- how many motions to remember
     max_motions = 10,
 
     definitions = {
@@ -128,86 +117,87 @@ return {
         -- { command = ":bnext", next = ":bnext", prev = ":bprev" },
 
         -- treesitter functions that are builtin to neovim
-        -- ts_next and ts_prev are defined above
+        -- local utils = require("last-motion.utils") -- import is required
         {
             desc = "[a]ttribute",
             next = "]a",
             prev = "[a",
-            next_func = ts_next("@attribute.inner"),
-            prev_func = ts_prev("@attribute.inner"),
+            next_func = utils.ts_next("@attribute.inner"),
+            prev_func = utils.ts_prev("@attribute.inner"),
         },
         {
             desc = "fram[e]",
             next = "]e",
             prev = "[e",
-            next_func = ts_next("@frame.inner"),
-            prev_func = ts_prev("@frame.inner"),
+            next_func = utils.ts_next("@frame.inner"),
+            prev_func = utils.ts_prev("@frame.inner"),
         },
         {
             desc = "c[o]mment",
             next = "]o",
             prev = "[o",
-            next_func = ts_next("@comment.outer"),
-            prev_func = ts_prev("@comment.outer"),
+            next_func = utils.ts_next("@comment.outer"),
+            prev_func = utils.ts_prev("@comment.outer"),
         },
         {
             desc = "bloc[k]",
             next = "]k",
             prev = "[k",
-            next_func = ts_next("@block.inner"),
-            prev_func = ts_prev("@block.inner"),
+            next_func = utils.ts_next("@block.inner"),
+            prev_func = utils.ts_prev("@block.inner"),
         },
         {
             desc = "[r]eturn",
             next = "]r",
             prev = "[r",
-            next_func = ts_next("@return.inner"),
-            prev_func = ts_prev("@return.inner"),
+            next_func = utils.ts_next("@return.inner"),
+            prev_func = utils.ts_prev("@return.inner"),
         },
         {
             desc = "[p]arameter",
             next = "]p",
             prev = "[p",
-            next_func = ts_next("@parameter.inner"),
-            prev_func = ts_prev("@parameter.inner"),
+            next_func = utils.ts_next("@parameter.inner"),
+            prev_func = utils.ts_prev("@parameter.inner"),
         },
         {
             desc = "[c]all",
             next = "]c",
             prev = "[c",
-            next_func = ts_next("@call.outer"),
-            prev_func = ts_prev("@call.outer"),
+            next_func = utils.ts_next("@call.outer"),
+            prev_func = utils.ts_prev("@call.outer"),
         },
         {
             desc = "[a]ssignment",
             next = "]a",
             prev = "[a",
-            next_func = ts_next("@assignment.rhs"),
-            prev_func = ts_prev("@assignment.rhs"),
+            next_func = utils.ts_next("@assignment.rhs"),
+            prev_func = utils.ts_prev("@assignment.rhs"),
         },
         {
             desc = "co[N]ditional",
             next = "]N",
             prev = "[N",
-            next_func = ts_next("@conditional.inner"),
-            prev_func = ts_prev("@conditional.inner"),
+            next_func = utils.ts_next("@conditional.inner"),
+            prev_func = utils.ts_prev("@conditional.inner"),
         },
         {
             desc = "[C]lass",
             next = "]C",
             prev = "[C",
-            next_func = ts_next("@class.inner"),
-            prev_func = ts_prev("@class.inner"),
+            next_func = utils.ts_next("@class.inner"),
+            prev_func = utils.ts_prev("@class.inner"),
         },
         {
             desc = "[f]unction",
             next = "]f",
             prev = "[f",
-            next_func = ts_next("@function.outer"),
-            prev_func = ts_prev("@function.outer"),
+            next_func = utils.ts_next("@function.outer"),
+            prev_func = utils.ts_prev("@function.outer"),
         },
 
         -- An attempt at moving through abstract treesitter nodes
+        -- local ts_utils = require("nvim-treesitter.ts_utils") -- import is required
         {
             desc = "[n]ode",
             next = "]n",
