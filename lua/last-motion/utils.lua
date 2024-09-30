@@ -67,6 +67,7 @@ M.remember = function(key, def, reverse)
             name = key,
             command = def.command,
             pending = def.pending,
+            searching = false, -- assume false to begin with
         })
 
         if last and not def.command then

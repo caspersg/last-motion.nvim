@@ -2,11 +2,14 @@ local search = require("last-motion.search")
 
 return {
     max_motions = 10,
+
     -- it doesn't matter which key in a pair is next or prev, as direction is preserved
     definitions = {
-        -- obvious ones
+        -- character motions are maybe pointless
         { next = "h", prev = "l" },
         { next = "j", prev = "k" },
+
+        -- obvious ones
         { next = "w", prev = "b" },
         { next = "W", prev = "B" },
         { next = "}", prev = "{" },
@@ -29,6 +32,7 @@ return {
         -- default commands, these are a special case as they use command mode
         { command = "/", next = "n", prev = "N" },
         { command = "?", next = "n", prev = "N" },
+        -- { command = ":bnext", next = ":bnext", prev = ":bprev" },
 
         -- some other functions
         {
