@@ -51,164 +51,164 @@ return {
         -- some other functions
         {
             desc = "search",
-            next_key = "*",
-            prev_key = "#",
-            next = search.next_search,
-            prev = search.prev_search,
+            next = "*",
+            prev = "#",
+            next_func = search.next_search,
+            prev_func = search.prev_search,
         },
         {
             -- adds key to get back to recent search results after other movements
             -- this is needed if you override n and N with repeating motions
             desc = "recent [s]earch",
-            next_key = "]s",
-            prev_key = "[s",
-            next = search.next_for_recent_search,
-            prev = search.prev_for_recent_search,
+            next = "]s",
+            prev = "[s",
+            next_func = search.next_for_recent_search,
+            prev_func = search.prev_for_recent_search,
         },
 
         {
             desc = "[d]iagnostic",
-            next_key = "]d",
-            prev_key = "[d",
-            next = vim.diagnostic.goto_next,
-            prev = vim.diagnostic.goto_prev,
+            next = "]d",
+            prev = "[d",
+            next_func = vim.diagnostic.goto_next,
+            prev_func = vim.diagnostic.goto_prev,
         },
 
         {
             desc = "fo[l]d",
-            next_key = "]l",
-            prev_key = "[l",
-            next = "zj",
-            prev = "zk",
+            next = "]l",
+            prev = "[l",
+            next_key = "zj",
+            prev_key = "zk",
         },
 
         {
             desc = "[w]indow",
-            next_key = "]w",
-            prev_key = "[w",
-            next = "<C-w>w",
-            prev = "<C-w>W",
+            next = "]w",
+            prev = "[w",
+            next_key = "<C-w>w",
+            prev_key = "<C-w>W",
         },
 
         {
             desc = "[q]uickfix item",
-            next_key = "]q",
-            prev_key = "[q",
-            next = vim.cmd.cnext,
-            prev = vim.cmd.cprevious,
+            next = "]q",
+            prev = "[q",
+            next_func = vim.cmd.cnext,
+            prev_func = vim.cmd.cprevious,
         },
 
         {
             desc = "[b]uffer",
-            next_key = "]b",
-            prev_key = "[b",
-            next = vim.cmd.bnext,
-            prev = vim.cmd.bprevious,
+            next = "]b",
+            prev = "[b",
+            next_func = vim.cmd.bnext,
+            prev_func = vim.cmd.bprevious,
         },
 
         {
             desc = "[t]ab",
-            next_key = "]t",
-            prev_key = "[t",
-            next = vim.cmd.tabnext,
-            prev = vim.cmd.tabprevious,
+            next = "]t",
+            prev = "[t",
+            next_func = vim.cmd.tabnext,
+            prev_func = vim.cmd.tabprevious,
         },
 
         -- treesitter functions
 
         {
             desc = "[a]ttribute",
-            next_key = "]a",
-            prev_key = "[a",
-            next = ts_next("@attribute.inner"),
-            prev = ts_prev("@attribute.inner"),
+            next = "]a",
+            prev = "[a",
+            next_func = ts_next("@attribute.inner"),
+            prev_func = ts_prev("@attribute.inner"),
         },
 
         {
             desc = "fram[e]",
-            next_key = "]e",
-            prev_key = "[e",
-            next = ts_next("@frame.inner"),
-            prev = ts_prev("@frame.inner"),
+            next = "]e",
+            prev = "[e",
+            next_func = ts_next("@frame.inner"),
+            prev_func = ts_prev("@frame.inner"),
         },
 
         {
             desc = "c[o]mment",
-            next_key = "]o",
-            prev_key = "[o",
-            next = ts_next("@comment.outer"),
-            prev = ts_prev("@comment.outer"),
+            next = "]o",
+            prev = "[o",
+            next_func = ts_next("@comment.outer"),
+            prev_func = ts_prev("@comment.outer"),
         },
 
         {
             desc = "bloc[k]",
-            next_key = "]k",
-            prev_key = "[k",
-            next = ts_next("@block.inner"),
-            prev = ts_prev("@block.inner"),
+            next = "]k",
+            prev = "[k",
+            next_func = ts_next("@block.inner"),
+            prev_func = ts_prev("@block.inner"),
         },
 
         {
             desc = "[r]eturn",
-            next_key = "]r",
-            prev_key = "[r",
-            next = ts_next("@return.inner"),
-            prev = ts_prev("@return.inner"),
+            next = "]r",
+            prev = "[r",
+            next_func = ts_next("@return.inner"),
+            prev_func = ts_prev("@return.inner"),
         },
 
         {
             desc = "[p]arameter",
-            next_key = "]p",
-            prev_key = "[p",
-            next = ts_next("@parameter.inner"),
-            prev = ts_prev("@parameter.inner"),
+            next = "]p",
+            prev = "[p",
+            next_func = ts_next("@parameter.inner"),
+            prev_func = ts_prev("@parameter.inner"),
         },
 
         {
             desc = "[c]all",
-            next_key = "]c",
-            prev_key = "[c",
-            next = ts_next("@call.outer"),
-            prev = ts_prev("@call.outer"),
+            next = "]c",
+            prev = "[c",
+            next_func = ts_next("@call.outer"),
+            prev_func = ts_prev("@call.outer"),
         },
 
         {
             desc = "[a]ssignment",
-            next_key = "]a",
-            prev_key = "[a",
-            next = ts_next("@assignment.rhs"),
-            prev = ts_prev("@assignment.rhs"),
+            next = "]a",
+            prev = "[a",
+            next_func = ts_next("@assignment.rhs"),
+            prev_func = ts_prev("@assignment.rhs"),
         },
 
         {
             desc = "co[N]ditional",
-            next_key = "]N",
-            prev_key = "[N",
-            next = ts_next("@conditional.inner"),
-            prev = ts_prev("@conditional.inner"),
+            next = "]N",
+            prev = "[N",
+            next_func = ts_next("@conditional.inner"),
+            prev_func = ts_prev("@conditional.inner"),
         },
 
         {
             desc = "[C]lass",
-            next_key = "]C",
-            prev_key = "[C",
-            next = ts_next("@class.inner"),
-            prev = ts_prev("@class.inner"),
+            next = "]C",
+            prev = "[C",
+            next_func = ts_next("@class.inner"),
+            prev_func = ts_prev("@class.inner"),
         },
 
         {
             desc = "[f]unction",
-            next_key = "]f",
-            prev_key = "[f",
-            next = ts_next("@function.outer"),
-            prev = ts_prev("@function.outer"),
+            next = "]f",
+            prev = "[f",
+            next_func = ts_next("@function.outer"),
+            prev_func = ts_prev("@function.outer"),
         },
 
         {
             desc = "[n]ode",
-            next_key = "]n",
-            prev_key = "[n",
-            next = function()
+            next = "]n",
+            prev = "[n",
+            next_func = function()
                 local node = ts_utils.get_node_at_cursor()
                 if node == nil then
                     error("No Treesitter parser found.")
@@ -220,7 +220,7 @@ return {
                 end
                 ts_utils.goto_node(next, true, false)
             end,
-            prev = function()
+            prev_func = function()
                 local node = ts_utils.get_node_at_cursor()
                 if node == nil then
                     error("No Treesitter parser found.")

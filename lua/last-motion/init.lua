@@ -36,6 +36,18 @@ local function validate(def)
     if def.prev_key ~= nil and type(def.prev_key) ~= "string" then
         err("prev_key is optional but must be a string", def)
     end
+    if def.next_func ~= nil and type(def.next_func) ~= "function" then
+        err("next_func is optional but must be a function", def)
+    end
+    if def.prev_func ~= nil and type(def.prev_func) ~= "function" then
+        err("prev_func is optional but must be a function", def)
+    end
+    if def.next_func and def.next_key then
+        err("cannot have both next_func and next_key", def)
+    end
+    if def.prev_func and def.prev_key then
+        err("cannot have both prev_func and prev_key", def)
+    end
 end
 
 local function register_command(def)
@@ -61,15 +73,12 @@ M.register = function(def)
         return
     end
 
-    -- always add keymaps for existing keys
-    def.next_key = def.next_key or ((type(def.next) == "string" and def.next) or nil)
-    def.prev_key = def.prev_key or ((type(def.prev) == "string" and def.prev) or nil)
-
-    -- add new keymaps
+    -- add new keymaps, these are required to replace existing behaviour
+    -- this is how motions are remembered
     local mapopts = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next_key, utils.remember(def.next_key, def, false), mapopts)
-    if def.prev_key then
-        vim.keymap.set({ "n", "v" }, def.prev_key, utils.remember(def.prev_key, def, true), mapopts)
+    vim.keymap.set({ "n", "v" }, def.next, utils.remember(def.next, def, false), mapopts)
+    if def.prev then
+        vim.keymap.set({ "n", "v" }, def.prev, utils.remember(def.prev, def, true), mapopts)
     end
     -- vim.notify("last-motion registered " .. vim.inspect(def))
 end

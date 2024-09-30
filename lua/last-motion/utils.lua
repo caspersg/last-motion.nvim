@@ -46,7 +46,7 @@ end
 --- @return function: the closure to remember the motion
 M.remember = function(key, def, reverse)
     return function()
-        -- get surrounding context
+        -- get surrounding context for the motion
         local count = vim.v.count
         local pending_chars = nil
         if def.pending then
@@ -54,9 +54,14 @@ M.remember = function(key, def, reverse)
             pending_chars = vim.fn.nr2char(vim.fn.getchar())
         end
 
+        -- need to figure out which field is the action
+        -- func overrides key, new key overrides default key
+        local next = def.next_func or def.next_key or def.next
+        local prev = def.prev_func or def.prev_key or def.prev
+
         -- maintain the current direction, so if moving backwards, next continues backwards
-        local forward = reverse and def.prev or def.next
-        local backward = reverse and def.next or def.prev
+        local forward = reverse and prev or next
+        local backward = reverse and next or prev
 
         local last = state.update_last({
             count = count,
