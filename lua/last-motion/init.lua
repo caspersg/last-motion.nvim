@@ -31,10 +31,11 @@ local function register_command(def)
     }
 end
 
---- register a motion
+--- register a motion, creates new keymaps by default
 --- @param def Definition: a motion definition
+--- @param skip_keymaps? boolean: skip adding keymaps, if true you must use the returned functions for your own keymaps, otherwise nothing will work
 --- @return table: next and prev functions which can be used in keymaps
-M.register = function(def)
+M.register = function(def, skip_keymaps)
     if def.command then
         return register_command(def)
         -- commands are a hook, so we don't need a new keymap
@@ -45,9 +46,14 @@ M.register = function(def)
     local mapopts = { desc = def.desc, noremap = true, silent = true }
     local remembered_next = utils.remember(def.next, def, false)
     local remembered_prev = utils.remember(def.prev, def, true)
-    vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
-    vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
+    if skip_keymaps then
+        vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
+        vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
+    end
     -- vim.notify("last-motion registered " .. vim.inspect(def))
+
+    -- or if you skip_keymaps, next and or prev must be used in your own keymap
+    -- but motion will be remembered with the name from def
     return {
         next = remembered_next,
         prev = remembered_prev,
