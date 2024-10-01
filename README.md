@@ -23,7 +23,33 @@ TODO add usage and a video
     { "nvim-treesitter/nvim-treesitter-textobjects", after = "nvim-treesitter" },
   },
   config = function()
-    require("last-motion").setup({ })
+    require("last-motion").setup({
+        -- override default config
+    })
+
+    -- You'll need to add keymaps for at least forward and backward to do anything useful.
+    local lm = require("last-motion")
+    vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
+    vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
+
+
+    -- these optional keymaps assume the default [ and ] prefixes from the default config
+
+    -- I add keymaps for repeating numbered motions from the history, default 0-9
+    for i = 0, 9 do
+      vim.keymap.set({ "n", "v" }, "]" .. i, function()
+        lm.nth(i)
+      end, { desc = "repeat " .. i, noremap = true, silent = true })
+    end
+
+    -- I also add a keymap to view the history
+    vim.keymap.set("n", "],", function()
+      vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
+    end, { desc = "last motions", noremap = true, silent = true })
+
+    -- comma "," is not needed anymore as we can use n/N, and , is easy to type than ]
+    -- this doesn't work, but nvim_set_keymap does vim.keymap.set("n", ",", "]", {})
+    vim.api.nvim_set_keymap("n", ",", "]", {})
   end,
 }
 ```
@@ -31,29 +57,6 @@ TODO add usage and a video
 ## Usage
 
 TODO
-
-## Keymaps
-
-You'll need to add keymaps for at least forward and backward to do anything useful.
-
-```lua
-local lm = require("last-motion")
--- add the main repeat and reverse keymaps
-vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
-vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
-
--- add keymaps to repeat a previous motion by index 0-9
-for i = 0, 9 do
-  vim.keymap.set({ "n", "v" }, "," .. i, function()
-    lm.nth(i)
-  end, { desc = "repeat " .. i, noremap = true, silent = true })
-end
-
--- add a keymap to show the history of motions
-vim.keymap.set("n", ",,", function()
-  vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
-end, { desc = "last motions", noremap = true, silent = true })
-```
 
 
 ## Default Configuration
@@ -66,8 +69,8 @@ Some of the definitions need to import helper functions that you'll need to impo
 
 
 ```lua
-local search = require("last-motion.search")
 local ts_utils = require("nvim-treesitter.ts_utils") -- from nvim-treesitter/nvim-treesitter-textobjects
+local search = require("last-motion.search")
 local utils = require("last-motion.utils")
 
 require("last-motion").setup({

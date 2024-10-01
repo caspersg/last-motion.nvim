@@ -1,5 +1,5 @@
-local search = require("last-motion.search")
 local ts_utils = require("nvim-treesitter.ts_utils") -- from nvim-treesitter/nvim-treesitter-textobjects
+local search = require("last-motion.search")
 local utils = require("last-motion.utils")
 
 return {
