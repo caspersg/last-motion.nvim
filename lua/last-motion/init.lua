@@ -106,7 +106,7 @@ end
 --- setup the plugin
 --- @param opts table: configuration options
 M.setup = function(opts)
-    M.config = vim.tbl_deep_extend("force", default_config, opts or {})
+    M.config = vim.tbl_deep_extend("keep", opts or {}, default_config)
 
     state.max_motions = M.config.max_motions
 

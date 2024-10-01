@@ -302,6 +302,34 @@ require("last-motion").setup({
 })
 ```
 
+## Manual Configuration
+
+If you don't want to use any of the default configurations or keymaps, you can register each pair manually.
+
+
+```lua
+require("last-motion").setup({
+    max_motions = 10,
+    definitions = {}
+})
+
+local mem = require("last-motion").register(
+    {
+      -- next/prev are still required to name it
+      next = ",m",
+      prev = ",M",
+      next_func = recall.goto_next,
+      prev_func = recall.goto_prev,
+    },
+    true -- this skips adding keymaps
+)
+if mem then
+  vim.keymap.set("n", ",m", mem.next, { desc = "next mark" })
+  vim.keymap.set("n", ",M", mem.prev, { desc = "prev mark" })
+end
+
+```
+
 
 ## TODO
 
