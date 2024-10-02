@@ -1,13 +1,25 @@
 # last-motion.nvim
 Repeat the last motion or reverse the last motion in Neovim.
+
 Like . (dot) repeat, but for all kinds of movements.
 
-Motion keymaps are replaced with next/prev pairs of keymaps that remember a history of previous motions.
 So you can:
-- repeat a motion
-- repeat a motion in the reverse direction
-- view recent motions
+- repeat the last motion
+- reverse the last motion
+- view motion history
+- repeat motion from history
 - add a count prefix to a repeat
+
+Motion keymaps are replaced with next/prev pairs of keymaps that remember a history of previous motions.
+It remembers direction, so for example 'n' after '?' will continue search upwards through the document.
+
+Some uses:
+- ']b' (:bnext keymap), then use n and N to move backwards and forwards through buffers
+- '2}' then scroll by 2 paragraphs with 'n' and 'N', or scroll by 4 paragraphs with '2n'
+- ']s' continue the most recent search
+
+I've done my best to add every motion in neovim, including treesitter motions like "@attribute.inner".
+hjkl seem pretty pointless to include, but you can repeat '10j' with 'n', go back up by 10 lines with N.
 
 TODO add usage and a video
 
@@ -47,7 +59,7 @@ TODO add usage and a video
       vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     end, { desc = "last motions", noremap = true, silent = true })
 
-    -- comma "," is not needed anymore as we can use n/N, and , is easy to type than ]
+    -- comma "," is not needed anymore, so I like to use it instead of ] as a motion leader
     -- this doesn't work, but nvim_set_keymap does vim.keymap.set("n", ",", "]", {})
     vim.api.nvim_set_keymap("n", ",", "]", {})
   end,
