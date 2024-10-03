@@ -1,7 +1,7 @@
 # last-motion.nvim
 Repeat the last motion or reverse the last motion in Neovim.
 
-Like . (dot) repeat, but for all kinds of movements.
+Like . (dot) repeat, but for motions.
 
 So you can:
 - repeat the last motion
@@ -31,23 +31,22 @@ TODO add usage and a video
 {
   "caspersg/last-motion.nvim",
   dependencies = {
-    { "nvim-treesitter/nvim-treesitter" }, --, build = ":TSUpdate" },
-    { "nvim-treesitter/nvim-treesitter-textobjects", after = "nvim-treesitter" },
+    { "nvim-treesitter/nvim-treesitter" },
+    { "nvim-treesitter/nvim-treesitter-textobjects" },
   },
   config = function()
-    require("last-motion").setup({
-        -- override default config
+    local lm = require("last-motion")
+    lm.setup({
+        -- empty to keep default config
     })
 
-    -- You'll need to add keymaps for at least forward and backward to do anything useful.
-    local lm = require("last-motion")
+    -- Add keymaps for at least forward and backward to do anything useful.
     vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
     vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
 
+    -- the following optional keymaps assume the default [ and ] prefixes from the default config
 
-    -- these optional keymaps assume the default [ and ] prefixes from the default config
-
-    -- I add keymaps for repeating numbered motions from the history, default 0-9
+    -- I add keymaps for repeating numbered motions from the history, default is 0-9
     for i = 0, 9 do
       vim.keymap.set({ "n", "v" }, "]" .. i, function()
         lm.nth(i)
@@ -59,9 +58,8 @@ TODO add usage and a video
       vim.notify(lm.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     end, { desc = "last motions", noremap = true, silent = true })
 
-    -- comma "," is not needed anymore, so I like to use it instead of ] as a motion leader
-    -- this doesn't work, but nvim_set_keymap does vim.keymap.set("n", ",", "]", {})
-    vim.api.nvim_set_keymap("n", ",", "]", {})
+    -- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
+    vim.keymap.set("n", ",", "]", { remap = true })
   end,
 }
 ```
@@ -96,31 +94,28 @@ require("last-motion").setup({
 
         -- with just next and prev, those keys should behave as normal
         -- as they will be replaced with new keymaps, that just call those keys and remember the motion
-        -- There is no reason to have new keymaps for such basic motions.
         { next = "w", prev = "b" },
         { next = "W", prev = "B" },
         { next = "}", prev = "{" },
         { next = ")", prev = "(" },
         { next = "e", prev = "ge" },
         { next = "E", prev = "gE" },
+        { next = "h", prev = "l" },
+        { next = "j", prev = "k" },
 
-        -- next_key and prev_key: can process control keys too
+        -- next and prev can process control keys too
         { next = "<C-d>", prev = "<C-u>" },
         { next = "<C-f>", prev = "<C-b>" },
         { next = "<C-i>", prev = "<C-o>" },
-
-        -- character motions probably aren't very useful
-        { next = "h", prev = "l" },
-        { next = "j", prev = "k" },
 
         -- these ones only go back and forth between two positions, so pretty pointless
         { next = "g_", prev = "^" },
         { next = "$", prev = "0" },
         { next = "G", prev = "gg" },
 
-        -- next_key and prev_key: when there's existing keys to override
-        -- default keymaps are with [ and ] prefixes, as that's an established pattern in neovim
-        -- New keymaps are added to be more consistent
+        -- use next_key and prev_key when there's existing keys to override
+        -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired
+        -- desc is to work with which-key
         {
             desc = "fo[l]d",
             next = "]l",
@@ -136,8 +131,7 @@ require("last-motion").setup({
             prev_key = "<C-w>W",
         },
 
-        -- next_func and prev_func: when there's a function to call instead of a key
-        -- These need new keymaps, as they don't already ones
+        -- use next_func and prev_func when there's a function to call instead of a key
         {
             desc = "[d]iagnostic",
             next = "]d",
@@ -168,13 +162,13 @@ require("last-motion").setup({
             prev_func = vim.cmd.tabprevious,
         },
 
-        -- pending: for operator pending, it will wait until the following key is entered
+        -- use pending for operator pending keys, so it will wait until the following key is entered
         -- maybe it's only a special case for fFtT ?
         { next = "f", prev = "F", pending = true },
         { next = "t", prev = "T", pending = true },
 
         -- search has a few special cases
-        -- command: for commands that are a special case and don't need to create any keymaps
+        -- uses command for keys that are a special case that don't need to create new keymaps
         { command = "/", next = "n", prev = "N" },
         { command = "?", next = "n", prev = "N" },
         -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
@@ -195,9 +189,6 @@ require("last-motion").setup({
             next_func = search.next_for_recent_search,
             prev_func = search.prev_for_recent_search,
         },
-
-        -- TODO: can actual command motions be repeated?
-        -- { command = ":bnext", next = ":bnext", prev = ":bprev" },
 
         -- treesitter functions that are builtin to neovim
         -- local utils = require("last-motion.utils") -- import is required
@@ -325,6 +316,7 @@ require("last-motion").setup({
     definitions = {}
 })
 
+-- you can explicitly register pairs, and write your own keymaps
 local mem = require("last-motion").register(
     {
       -- next/prev are still required to name it

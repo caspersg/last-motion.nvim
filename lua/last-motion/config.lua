@@ -13,31 +13,28 @@ return {
 
         -- with just next and prev, those keys should behave as normal
         -- as they will be replaced with new keymaps, that just call those keys and remember the motion
-        -- There is no reason to have new keymaps for such basic motions.
         { next = "w", prev = "b" },
         { next = "W", prev = "B" },
         { next = "}", prev = "{" },
         { next = ")", prev = "(" },
         { next = "e", prev = "ge" },
         { next = "E", prev = "gE" },
+        { next = "h", prev = "l" },
+        { next = "j", prev = "k" },
 
-        -- next_key and prev_key: can process control keys too
+        -- next and prev can process control keys too
         { next = "<C-d>", prev = "<C-u>" },
         { next = "<C-f>", prev = "<C-b>" },
         { next = "<C-i>", prev = "<C-o>" },
-
-        -- character motions probably aren't very useful
-        { next = "h", prev = "l" },
-        { next = "j", prev = "k" },
 
         -- these ones only go back and forth between two positions, so pretty pointless
         { next = "g_", prev = "^" },
         { next = "$", prev = "0" },
         { next = "G", prev = "gg" },
 
-        -- next_key and prev_key: when there's existing keys to override
-        -- default keymaps are with [ and ] prefixes, as that's an established pattern in neovim
-        -- New keymaps are added to be more consistent
+        -- use next_key and prev_key when there's existing keys to override
+        -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired
+        -- desc is to work with which-key
         {
             desc = "fo[l]d",
             next = "]l",
@@ -53,8 +50,7 @@ return {
             prev_key = "<C-w>W",
         },
 
-        -- next_func and prev_func: when there's a function to call instead of a key
-        -- These need new keymaps, as they don't already ones
+        -- use next_func and prev_func when there's a function to call instead of a key
         {
             desc = "[d]iagnostic",
             next = "]d",
@@ -85,13 +81,13 @@ return {
             prev_func = vim.cmd.tabprevious,
         },
 
-        -- pending: for operator pending, it will wait until the following key is entered
+        -- use pending for operator pending keys, so it will wait until the following key is entered
         -- maybe it's only a special case for fFtT ?
         { next = "f", prev = "F", pending = true },
         { next = "t", prev = "T", pending = true },
 
         -- search has a few special cases
-        -- command: for commands that are a special case and don't need to create any keymaps
+        -- uses command for keys that are a special case that don't need to create new keymaps
         { command = "/", next = "n", prev = "N" },
         { command = "?", next = "n", prev = "N" },
         -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
@@ -112,9 +108,6 @@ return {
             next_func = search.next_for_recent_search,
             prev_func = search.prev_for_recent_search,
         },
-
-        -- TODO: can actual command motions be repeated?
-        -- { command = ":bnext", next = ":bnext", prev = ":bprev" },
 
         -- treesitter functions that are builtin to neovim
         -- local utils = require("last-motion.utils") -- import is required
