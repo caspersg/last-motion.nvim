@@ -25,31 +25,28 @@ end
 --- @param action string|function: the exact keys for the motion or function to execute
 --- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
 --- @return function: the closure to execute the action
-M.as_exec = function(count, action, pending_chars)
-    if type(action) == "string" then
-        -- it's a raw set of keys to execute
-        local countstr = count > 0 and count or ""
-        local cmd_str = countstr .. action .. (pending_chars or "")
-        local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-        if string.find(action, "<C%-i>") then
-            -- C-i is a special case, it's the same as tab, so it requires feedkeys
-            return function()
+M.as_exec = function(action, count, pending_chars)
+    -- don't execute any of it now, do it on the repeat
+    return function()
+        if type(action) == "string" then
+            -- it's a raw set of keys to execute
+            local countstr = count > 0 and count or ""
+            local cmd_str = countstr .. action .. (pending_chars or "")
+            local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
+            if string.find(action, "<C%-i>") then
+                -- C-i is a special case, it's the same as tab, so it requires feedkeys
                 vim.api.nvim_feedkeys(cmd, "n", true)
-            end
-        else
-            return function()
+            else
                 vim.cmd("normal! " .. cmd)
             end
-        end
-    elseif type(action) == "function" then
-        -- add count to any repeated motion
-        return function()
+        elseif type(action) == "function" then
+            -- add count to any repeated motion
             for _ = 1, math.max(count, 1) do
                 action()
             end
+        else
+            error("Invalid action type: " .. type(action))
         end
-    else
-        error("Invalid action type: " .. type(action))
     end
 end
 
@@ -59,7 +56,18 @@ end
 --- @param reverse boolean: if true, the motion is reversed
 --- @return function: the closure to remember the motion
 M.remember = function(key, def, reverse)
+    -- need to figure out which field is the action
+    -- func overrides key, new key overrides default key
+    local next = def.next_func or def.next_key or def.next
+    local prev = def.prev_func or def.prev_key or def.prev
+
+    -- maintain the current direction, so if moving backwards, next continues backwards
+    local forward = reverse and prev or next
+    local backward = reverse and next or prev
+
     return function()
+        -- this is inline with all motions, so do as little as possible here
+
         -- get surrounding context for the motion
         local count = vim.v.count
         local pending_chars = nil
@@ -68,20 +76,11 @@ M.remember = function(key, def, reverse)
             pending_chars = vim.fn.nr2char(vim.fn.getchar())
         end
 
-        -- need to figure out which field is the action
-        -- func overrides key, new key overrides default key
-        local next = def.next_func or def.next_key or def.next
-        local prev = def.prev_func or def.prev_key or def.prev
-
-        -- maintain the current direction, so if moving backwards, next continues backwards
-        local forward = reverse and prev or next
-        local backward = reverse and next or prev
-
-        local last = state.update_last({
+        local current_motion = state.update_last({
             count = count,
             pending_chars = pending_chars,
-            forward = M.as_exec(count, forward, pending_chars),
-            backward = M.as_exec(count, backward, pending_chars),
+            forward = M.as_exec(forward, count, pending_chars),
+            backward = M.as_exec(backward, count, pending_chars),
 
             name = key,
             command = def.command,
@@ -89,9 +88,9 @@ M.remember = function(key, def, reverse)
             searching = false, -- assume false to begin with
         })
 
-        if last and not def.command then
+        if not def.command then
             -- commands are detected with hooks, so they've already been called
-            last.forward()
+            current_motion.forward()
         end
     end
 end
