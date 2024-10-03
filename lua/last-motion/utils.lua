@@ -1,7 +1,6 @@
 local M = {}
 
 local state = require("last-motion.state")
-local ts_utils = require("nvim-treesitter.ts_utils")
 local ts_move = require("nvim-treesitter.textobjects.move")
 
 M.ts_next = function(query)
@@ -21,24 +20,25 @@ M.notify_last_motion = function()
     vim.notify("last motion" .. vim.inspect(state.last()))
 end
 
---- prepare an action to be executed
+--- prepare an action
 --- @param count number: the count for the motion, 0 if there is no count
 --- @param action string|function: the exact keys for the motion or function to execute
 --- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
 --- @return function: the closure to execute the action
 M.as_exec = function(count, action, pending_chars)
-    if type(action) == "string" then -- it's a raw set of keys to execute
+    if type(action) == "string" then
+        -- it's a raw set of keys to execute
         local countstr = count > 0 and count or ""
-        local cmd = countstr .. action .. (pending_chars or "")
-        -- vim.notify("cmd " .. cmd) -- debugging
+        local cmd_str = countstr .. action .. (pending_chars or "")
+        local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
         if string.find(action, "<C%-i>") then
+            -- C-i is a special case, it's the same as tab, so it requires feedkeys
             return function()
-                -- C-i is a special case, it's the same as tab, so it requires feedkeys
-                vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n", true)
+                vim.api.nvim_feedkeys(cmd, "n", true)
             end
         else
             return function()
-                vim.cmd("normal! " .. vim.api.nvim_replace_termcodes(cmd, true, true, true))
+                vim.cmd("normal! " .. cmd)
             end
         end
     elseif type(action) == "function" then

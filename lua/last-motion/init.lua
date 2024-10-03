@@ -60,7 +60,7 @@ M.register = function(def, skip_keymaps)
     }
 end
 
--- repeat the last motion
+-- repeat the last motion, with count
 M.forward = function()
     if state.last() then
         local count = vim.v.count
@@ -70,7 +70,7 @@ M.forward = function()
     end
 end
 
--- repeat the last motion in reverse
+-- repeat the last motion in reverse, with count
 M.backward = function()
     if state.last() then
         local count = vim.v.count
@@ -80,7 +80,7 @@ M.backward = function()
     end
 end
 
--- repeat motion at offset, 0 is more recent, 9 is oldest
+-- repeat motion at offset with count, 0 is more recent, 9 is oldest
 -- @param offset number: the offset into the history
 M.nth = function(offset)
     local motion = state.get(offset)
@@ -92,7 +92,7 @@ M.nth = function(offset)
     end
 end
 
---- get the latest 10 motions
+--- get the latest motions
 --- @return string: the motions each on a new line
 M.get_last_motions = function()
     local lines = {}
