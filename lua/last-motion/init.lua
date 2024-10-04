@@ -30,8 +30,8 @@ end
 --- @return table: next and prev functions which can be used in keymaps
 M.key_motion = function(next_key, prev_key, is_pending)
   return {
-    next = utils.remember_key(next_key, prev_key, is_pending),
-    prev = utils.remember_key(prev_key, next_key, is_pending),
+    next = utils.remember_key(next_key, prev_key, is_pending, false),
+    prev = utils.remember_key(prev_key, next_key, is_pending, false),
   }
 end
 
@@ -40,13 +40,13 @@ end
 --- @param next string: the next keymap to use
 --- @param prev string: the previous keymap to use
 M.cmd_motion = function(command, next, prev)
-  local mem_next = utils.remember_key(next, prev, false)
-  local mem_prev = utils.remember_key(prev, next, false)
+  local mem_next = utils.remember_key(next, prev, false, true)
+  local mem_prev = utils.remember_key(prev, next, false, true)
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
       if not vim.v.event.abort and vim.fn.expand("<afile>") == command then
-        -- call the closure immediately
+        -- call the closure immediately, just to remember it
         mem_next()
       end
     end,

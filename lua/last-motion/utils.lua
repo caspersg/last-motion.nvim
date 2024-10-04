@@ -50,8 +50,9 @@ end
 --- @param forward string: the forward keys
 --- @param backward string: the backwards keys
 --- @param is_pending boolean: whether this motion is in operator pending mode
+--- @param is_cmd boolean: cmd doesn't need to execute the keys
 --- @return function: the closure to be used in a keymap
-M.remember_key = function(forward, backward, is_pending)
+M.remember_key = function(forward, backward, is_pending, is_cmd)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
@@ -71,7 +72,9 @@ M.remember_key = function(forward, backward, is_pending)
       backward_keys = countstr .. backward .. pending_chars,
     })
 
-    M.exec_keys(count_forward)
+    if not is_cmd then
+      M.exec_keys(count_forward)
+    end
   end
 end
 
