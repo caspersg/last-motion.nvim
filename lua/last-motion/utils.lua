@@ -35,7 +35,7 @@ end
 
 --- execute a basic key sequence
 --- @param cmd_str string: the exact keys for the motion
-M.exec_basic_key = function(cmd_str)
+M.exec_keys = function(cmd_str)
   -- it's a raw set of keys to execute
   local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
   if string.find(cmd_str, "<C%-i>") then
@@ -46,24 +46,12 @@ M.exec_basic_key = function(cmd_str)
   end
 end
 
---- execute a basic key sequence or a function
---- @param action string|function: the exact keys for the motion or function to execute
-M.exec_action = function(action)
-  if type(action) == "string" then
-    M.exec_basic_key(action)
-  elseif type(action) == "function" then
-    action()
-  else
-    error("Invalid action type: " .. type(action) .. " for " .. vim.inspect(action))
-  end
-end
-
 --- remember this basic key so it can be repeated
 --- @param forward string: the forward keys
 --- @param backward string: the backwards keys
 --- @param is_pending boolean: whether this motion is in operator pending mode
 --- @return function: the closure to be used in a keymap
-M.remember_basic_key = function(forward, backward, is_pending)
+M.remember_key = function(forward, backward, is_pending)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
@@ -78,19 +66,12 @@ M.remember_basic_key = function(forward, backward, is_pending)
     local count_forward = countstr .. forward .. pending_chars
 
     state.update_last({
-      count = count,
-      pending_chars = "",
-      forward = count_forward,
-      backward = countstr .. backward .. pending_chars,
-
-      name = forward,
-      command = "",
-      pending = false,
-      searching = false, -- assume false to begin with
+      name = count_forward,
+      forward_keys = count_forward,
+      backward_keys = countstr .. backward .. pending_chars,
     })
 
-    --
-    M.exec_basic_key(count_forward)
+    M.exec_keys(count_forward)
   end
 end
 
@@ -105,20 +86,16 @@ M.remember_func = function(key, forward, backward)
 
     -- get surrounding context for the motion
     local count = vim.v.count
+    local countstr = count > 0 and count or ""
+    local count_forward = M.with_count(forward, count)
 
-    local current_motion = state.update_last({
-      count = count,
-      pending_chars = "",
-      forward = M.with_count(forward, count),
-      backward = M.with_count(backward, count),
-
-      name = key,
-      command = "",
-      pending = false,
-      searching = false, -- assume false to begin with
+    state.update_last({
+      name = countstr .. key,
+      forward_func = count_forward,
+      backward_func = M.with_count(backward, count),
     })
 
-    current_motion.forward()
+    count_forward()
   end
 end
 

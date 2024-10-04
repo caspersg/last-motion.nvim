@@ -30,8 +30,8 @@ end
 --- @return table: next and prev functions which can be used in keymaps
 M.key_motion = function(next_key, prev_key, is_pending)
   return {
-    next = utils.remember_basic_key(next_key, prev_key, is_pending),
-    prev = utils.remember_basic_key(prev_key, next_key, is_pending),
+    next = utils.remember_key(next_key, prev_key, is_pending),
+    prev = utils.remember_key(prev_key, next_key, is_pending),
   }
 end
 
@@ -40,8 +40,8 @@ end
 --- @param next string: the next keymap to use
 --- @param prev string: the previous keymap to use
 M.cmd_motion = function(command, next, prev)
-  local mem_next = utils.remember_basic_key(next, prev, false)
-  local mem_prev = utils.remember_basic_key(prev, next, false)
+  local mem_next = utils.remember_key(next, prev, false)
+  local mem_prev = utils.remember_key(prev, next, false)
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
@@ -59,21 +59,31 @@ end
 
 -- repeat the last motion, with count
 M.forward = function()
-  if state.last() then
+  local motion = state.last()
+  if motion then
     -- count specific to the repeat, so multiplies with the original count
     local count = vim.v.count
     for _ = 1, math.max(count, 1) do
-      utils.exec_action(state.last().forward)
+      if motion.forward_keys then
+        utils.exec_keys(motion.forward_keys)
+      else
+        motion.forward_func()
+      end
     end
   end
 end
 
 -- repeat the last motion in reverse, with count
 M.backward = function()
-  if state.last() then
+  local motion = state.last()
+  if motion then
     local count = vim.v.count
     for _ = 1, math.max(count, 1) do
-      utils.exec_action(state.last().backward)
+      if motion.backward_keys then
+        utils.exec_keys(motion.backward_keys)
+      else
+        motion.backward_func()
+      end
     end
   end
 end
@@ -85,7 +95,11 @@ M.nth = function(offset)
   if motion then
     local count = vim.v.count
     for _ = 1, math.max(count, 1) do
-      utils.exec_action(motion.forward)
+      if motion.forward_keys then
+        utils.exec_keys(motion.forward_keys)
+      else
+        motion.forward_func()
+      end
     end
   end
 end
