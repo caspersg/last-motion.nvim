@@ -12,27 +12,27 @@ Motion.__index = Motion
 
 --- create a new motion
 function Motion.new(opts)
-    local new = setmetatable({}, Motion)
+  local new = setmetatable({}, Motion)
 
-    new.count = opts.count
-    new.pending_chars = opts.pending_chars
-    new.forward = opts.forward
-    new.backward = opts.backward
+  new.count = opts.count
+  new.pending_chars = opts.pending_chars
+  new.forward = opts.forward
+  new.backward = opts.backward
 
-    -- debugging
-    new.name = opts.name
-    new.command = opts.command
-    new.pending = opts.pending
+  -- debugging
+  new.name = opts.name
+  new.command = opts.command
+  new.pending = opts.pending
 
-    return new
+  return new
 end
 
 function Motion:display()
-    local count = ""
-    if self.count > 0 then
-        count = "" .. self.count
-    end
-    return string.format("%s%s%s", count, self.name, self.pending_chars or "")
+  local count = ""
+  if self.count > 0 then
+    count = "" .. self.count
+  end
+  return string.format("%s%s%s", count, self.name, self.pending_chars or "")
 end
 
 return Motion
