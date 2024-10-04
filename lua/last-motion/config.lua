@@ -6,7 +6,7 @@ return {
     -- how many motions to remember
     max_motions = 10,
 
-    definitions = {
+    basic_keys = {
         -- Ideally this would have every pair of motions
 
         -- it doesn't matter which key in a pair is next or prev, as direction is preserved
@@ -31,6 +31,9 @@ return {
         { next = "g_", prev = "^" },
         { next = "$", prev = "0" },
         { next = "G", prev = "gg" },
+    },
+
+    definitions = {
 
         -- use next_key and prev_key when there's existing keys to override
         -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired

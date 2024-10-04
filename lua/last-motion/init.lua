@@ -60,12 +60,20 @@ M.register = function(def, skip_keymaps)
     }
 end
 
+M.register_basic_key = function(next_key, prev_key)
+    return {
+        next = utils.remember_basic_key(next_key, prev_key),
+        prev = utils.remember_basic_key(prev_key, next_key),
+    }
+end
+
 -- repeat the last motion, with count
 M.forward = function()
     if state.last() then
+        -- count specific to the repeat, so multiplies with the original count
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last().forward()
+            utils.exec_action(state.last().forward)
         end
     end
 end
@@ -75,7 +83,7 @@ M.backward = function()
     if state.last() then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            state.last().backward()
+            utils.exec_action(state.last().backward)
         end
     end
 end
@@ -87,7 +95,7 @@ M.nth = function(offset)
     if motion then
         local count = vim.v.count
         for _ = 1, math.max(count, 1) do
-            motion.forward()
+            utils.exec_action(motion.forward)
         end
     end
 end
@@ -109,6 +117,14 @@ M.setup = function(opts)
     M.config = vim.tbl_deep_extend("keep", opts or {}, default_config)
 
     state.max_motions = M.config.max_motions
+
+    for _, def in ipairs(M.config.basic_keys) do
+        local mem = M.register_basic_key(def.next, def.prev)
+
+        local mapopts = { noremap = true, silent = true }
+        vim.keymap.set({ "n", "v" }, def.next, mem.next, mapopts)
+        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, mapopts)
+    end
 
     for _, def in ipairs(M.config.definitions) do
         M.register(Definition.new(def))

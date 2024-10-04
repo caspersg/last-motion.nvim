@@ -95,4 +95,52 @@ M.remember = function(key, def, reverse)
     end
 end
 
+M.exec_basic_key = function(action)
+    -- it's a raw set of keys to execute
+    local cmd = vim.api.nvim_replace_termcodes(action, true, true, true)
+    if string.find(action, "<C%-i>") then
+        -- C-i is a special case, it's the same as tab, so it requires feedkeys
+        vim.api.nvim_feedkeys(cmd, "n", true)
+    else
+        vim.cmd("normal! " .. cmd)
+    end
+end
+
+M.exec_action = function(action)
+    if type(action) == "string" then
+        M.exec_basic_key(action)
+    elseif type(action) == "function" then
+        action()
+    else
+        error("Invalid action type: " .. type(action) .. " for " .. vim.inspect(action))
+    end
+end
+
+M.remember_basic_key = function(forward, backward)
+    return function()
+        -- this is inline with all motions, so do as little as possible here
+
+        -- get surrounding context for the motion
+        -- this is why we can't just return the keys as a string
+        local count = vim.v.count
+        local countstr = count > 0 and count or ""
+        local count_forward = countstr .. forward
+
+        state.update_last({
+            count = count,
+            pending_chars = "",
+            forward = count_forward,
+            backward = countstr .. backward,
+
+            name = forward,
+            command = "",
+            pending = false,
+            searching = false, -- assume false to begin with
+        })
+
+        --
+        M.exec_basic_key(count_forward)
+    end
+end
+
 return M
