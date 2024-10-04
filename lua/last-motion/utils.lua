@@ -121,7 +121,6 @@ M.remember_basic_key = function(forward, backward)
         -- this is inline with all motions, so do as little as possible here
 
         -- get surrounding context for the motion
-        -- this is why we can't just return the keys as a string
         local count = vim.v.count
         local countstr = count > 0 and count or ""
         local count_forward = countstr .. forward

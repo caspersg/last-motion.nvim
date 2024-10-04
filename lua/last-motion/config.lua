@@ -6,13 +6,14 @@ return {
     -- how many motions to remember
     max_motions = 10,
 
+    -- Ideally this would have every pair of motions
+    -- it doesn't matter which key in a pair is next or prev, as direction is preserved
+
     basic_keys = {
-        -- Ideally this would have every pair of motions
-
-        -- it doesn't matter which key in a pair is next or prev, as direction is preserved
-
+        -- for just basic keys
         -- with just next and prev, those keys should behave as normal
         -- as they will be replaced with new keymaps, that just call those keys and remember the motion
+
         { next = "w", prev = "b" },
         { next = "W", prev = "B" },
         { next = "}", prev = "{" },
@@ -26,6 +27,8 @@ return {
         { next = "<C-d>", prev = "<C-u>" },
         { next = "<C-f>", prev = "<C-b>" },
         { next = "<C-i>", prev = "<C-o>" },
+        { next = "zj", prev = "zk" },
+        { next = "<C-w>w", prev = "<C-w>W" },
 
         -- these ones only go back and forth between two positions, so pretty pointless
         { next = "g_", prev = "^" },
@@ -38,21 +41,21 @@ return {
         -- use next_key and prev_key when there's existing keys to override
         -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired
         -- desc is to work with which-key
-        {
-            desc = "fo[l]d",
-            next = "]l",
-            prev = "[l",
-            next_key = "zj",
-            prev_key = "zk",
-        },
-        {
-            desc = "[w]indow",
-            next = "]w",
-            prev = "[w",
-            next_key = "<C-w>w",
-            prev_key = "<C-w>W",
-        },
-
+        -- {
+        --     desc = "fo[l]d",
+        --     next = "]l",
+        --     prev = "[l",
+        --     next_key = "zj",
+        --     prev_key = "zk",
+        -- },
+        -- {
+        --     desc = "[w]indow",
+        --     next = "]w",
+        --     prev = "[w",
+        --     next_key = "<C-w>w",
+        --     prev_key = "<C-w>W",
+        -- },
+        --
         -- use next_func and prev_func when there's a function to call instead of a key
         {
             desc = "[d]iagnostic",
