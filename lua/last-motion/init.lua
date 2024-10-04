@@ -4,81 +4,63 @@
 
 local utils = require("last-motion.utils")
 local state = require("last-motion.state")
+local Definition = require("last-motion.definition")
 local default_config = require("last-motion.config")
 
 local M = {}
 
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
-local function err(msg, def)
-    error(msg .. " " .. vim.inspect(def))
-end
-
-local function validate(def)
-    if not def.next or def.next == "" then
-        err("next is always required", def)
-    end
-    if def.prev ~= nil and def.prev == "" then
-        err("prev is optional but cannot be empty", def)
-    end
-    if def.desc ~= nil and def.desc == "" then
-        err("desc is optional but cannot be empty", def)
-    end
-    if def.command ~= nil and def.desc == "" then
-        err("command is optional but cannot be empty", def)
-    end
-    if def.pending ~= nil and type(def.pending) ~= "boolean" then
-        err("pending is optional but must be a boolean", def)
-    end
-    if def.next_keys ~= nil and type(def.next_keys) ~= "table" then
-        err("next_keys is optional but must be a table", def)
-    end
-    if def.prev_keys ~= nil and type(def.prev_keys) ~= "table" then
-        err("prev_keys is optional but must be a table", def)
-    end
-end
-
+--- register a command
+--- @param def Definition: a command definition
 local function register_command(def)
+    local next = utils.remember(def.command, def, false)
+    local prev = utils.remember(def.command, def, true)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
         group = group,
         callback = function()
             if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
                 -- call the closure immediately
-                utils.remember(def.command, def, false)()
+                next()
             end
         end,
     })
+    return {
+        next = next,
+        prev = prev,
+    }
 end
 
---- register a motion
---- @param def table: the motion definition
-M.register = function(def)
-    validate(def)
-
+--- register a motion, creates new keymaps by default
+--- @param def Definition: a motion definition
+--- @param skip_keymaps? boolean: skip adding keymaps, if true you must use the returned functions for your own keymaps, otherwise nothing will work
+--- @return table: next and prev functions which can be used in keymaps
+M.register = function(def, skip_keymaps)
     if def.command then
-        register_command(def)
+        return register_command(def)
         -- commands are a hook, so we don't need a new keymap
-        return
     end
 
-    -- always add keymaps for existing keys
-    def.next_keys = def.next_keys or ((type(def.next) == "string" and { def.next }) or {})
-    def.prev_keys = def.prev_keys or ((type(def.prev) == "string" and { def.prev }) or {})
-
-    -- add new keymaps
+    -- add new keymaps, these are required to replace existing behaviour
+    -- this is how motions are remembered
     local mapopts = { desc = def.desc, noremap = true, silent = true }
-    for _, key in ipairs(def.next_keys) do
-        vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, false), mapopts)
-    end
-    if def.prev_keys then
-        for _, key in ipairs(def.prev_keys) do
-            vim.keymap.set({ "n", "v" }, key, utils.remember(key, def, true), mapopts)
-        end
+    local remembered_next = utils.remember(def.next, def, false)
+    local remembered_prev = utils.remember(def.prev, def, true)
+    if not skip_keymaps then
+        vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
+        vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
     end
     -- vim.notify("last-motion registered " .. vim.inspect(def))
+
+    -- or if you skip_keymaps, next and or prev must be used in your own keymap
+    -- but motion will be remembered with the name from def
+    return {
+        next = remembered_next,
+        prev = remembered_prev,
+    }
 end
 
--- repeat the last motion
+-- repeat the last motion, with count
 M.forward = function()
     if state.last() then
         local count = vim.v.count
@@ -88,7 +70,7 @@ M.forward = function()
     end
 end
 
--- repeat the last motion in reverse
+-- repeat the last motion in reverse, with count
 M.backward = function()
     if state.last() then
         local count = vim.v.count
@@ -98,7 +80,7 @@ M.backward = function()
     end
 end
 
--- repeat motion at offset, 0 is more recent, 9 is oldest
+-- repeat motion at offset with count, 0 is more recent, 9 is oldest
 -- @param offset number: the offset into the history
 M.nth = function(offset)
     local motion = state.get(offset)
@@ -110,7 +92,7 @@ M.nth = function(offset)
     end
 end
 
---- get the latest 10 motions
+--- get the latest motions
 --- @return string: the motions each on a new line
 M.get_last_motions = function()
     local lines = {}
@@ -124,31 +106,17 @@ end
 --- setup the plugin
 --- @param opts table: configuration options
 M.setup = function(opts)
-    M.config = vim.tbl_deep_extend("force", default_config, opts or {})
+    M.config = vim.tbl_deep_extend("keep", opts or {}, default_config)
 
     state.max_motions = M.config.max_motions
 
-    for _, definition in ipairs(M.config.definitions) do
-        M.register(definition)
+    for _, def in ipairs(M.config.definitions) do
+        M.register(Definition.new(def))
     end
 
-    vim.api.nvim_create_user_command("LastMotions", function()
+    vim.api.nvim_create_user_command("LastMotionsNotify", function()
         vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
     end, {})
-
-    -- Add these yourself
-    -- vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    -- vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion", noremap = true, silent = true })
-    --
-    -- for i = 0, 9 do
-    --     vim.keymap.set({ "n", "v" }, "," .. i, function()
-    --         M.nth(i)
-    --     end, { desc = "repeat motion" .. i, noremap = true, silent = true })
-    -- end
-    --
-    -- vim.keymap.set("n", ",,", function()
-    --     vim.notify(M.print_last_motions, vim.log.levels.INFO, { title = "Last Motions" })
-    -- end, { desc = "last motions", noremap = true, silent = true })
 end
 
 return M
