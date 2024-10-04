@@ -11,6 +11,24 @@ local M = {}
 
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
+--- register a motion, creates new keymaps by default
+--- @return table: next and prev functions which can be used in keymaps
+M.register_func = function(next, prev, next_func, prev_func)
+    -- add new keymaps, these are required to replace existing behaviour
+    -- this is how motions are remembered
+    return {
+        next = utils.remember(next, next_func, prev_func),
+        prev = utils.remember(prev, prev_func, next_func),
+    }
+end
+
+M.register_basic_key = function(next_key, prev_key, is_pending)
+    return {
+        next = utils.remember_basic_key(next_key, prev_key, is_pending),
+        prev = utils.remember_basic_key(prev_key, next_key, is_pending),
+    }
+end
+
 --- register a command
 --- @param command string: the command to register
 --- @param next string: the next keymap to use
@@ -30,37 +48,6 @@ M.register_command = function(command, next, prev)
     return {
         next = mem_next,
         prev = mem_prev,
-    }
-end
-
---- register a motion, creates new keymaps by default
---- @param def Definition: a motion definition
---- @param skip_keymaps? boolean: skip adding keymaps, if true you must use the returned functions for your own keymaps, otherwise nothing will work
---- @return table: next and prev functions which can be used in keymaps
-M.register = function(def, skip_keymaps)
-    -- add new keymaps, these are required to replace existing behaviour
-    -- this is how motions are remembered
-    local mapopts = { desc = def.desc, noremap = true, silent = true }
-    local remembered_next = utils.remember(def.next, def, false)
-    local remembered_prev = utils.remember(def.prev, def, true)
-    if not skip_keymaps then
-        vim.keymap.set({ "n", "v" }, def.next, remembered_next, mapopts)
-        vim.keymap.set({ "n", "v" }, def.prev, remembered_prev, mapopts)
-    end
-    -- vim.notify("last-motion registered " .. vim.inspect(def))
-
-    -- or if you skip_keymaps, next and or prev must be used in your own keymap
-    -- but motion will be remembered with the name from def
-    return {
-        next = remembered_next,
-        prev = remembered_prev,
-    }
-end
-
-M.register_basic_key = function(next_key, prev_key, is_pending)
-    return {
-        next = utils.remember_basic_key(next_key, prev_key, is_pending),
-        prev = utils.remember_basic_key(prev_key, next_key, is_pending),
     }
 end
 
@@ -138,8 +125,12 @@ M.setup = function(opts)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
-    for _, def in ipairs(M.config.definitions) do
-        M.register(Definition.new(def))
+    for _, def in ipairs(M.config.functions) do
+        local mem = M.register_func(def.next, def.prev, def.next_func, def.prev_func)
+
+        local desc = { desc = def.desc, noremap = true, silent = true }
+        vim.keymap.set({ "n", "v" }, def.next, mem.next, desc)
+        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
     end
 
     -- extra keymaps for [ ] consistency

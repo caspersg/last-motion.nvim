@@ -20,78 +20,42 @@ M.notify_last_motion = function()
     vim.notify("last motion" .. vim.inspect(state.last()))
 end
 
---- prepare an action
+--- add count to a motion to make it repeatable with count
 --- @param count number: the count for the motion, 0 if there is no count
 --- @param action string|function: the exact keys for the motion or function to execute
---- @param pending_chars? string: the pending chars for the motion, if it supports operator pending
 --- @return function: the closure to execute the action
-M.as_exec = function(action, count, pending_chars)
-    -- don't execute any of it now, do it on the repeat
+M.with_count = function(action, count)
     return function()
-        if type(action) == "string" then
-            -- it's a raw set of keys to execute
-            local countstr = count > 0 and count or ""
-            local cmd_str = countstr .. action .. (pending_chars or "")
-            local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-            if string.find(action, "<C%-i>") then
-                -- C-i is a special case, it's the same as tab, so it requires feedkeys
-                vim.api.nvim_feedkeys(cmd, "n", true)
-            else
-                vim.cmd("normal! " .. cmd)
-            end
-        elseif type(action) == "function" then
-            -- add count to any repeated motion
-            for _ = 1, math.max(count, 1) do
-                action()
-            end
-        else
-            error("Invalid action type: " .. type(action))
+        -- repeat at least once
+        for _ = 1, math.max(count, 1) do
+            action()
         end
     end
 end
 
 --- remember this motion so it can be repeated
 --- @param key string: the key that triggered the motion
---- @param def table: the motion definition
---- @param reverse boolean: if true, the motion is reversed
 --- @return function: the closure to remember the motion
-M.remember = function(key, def, reverse)
-    -- need to figure out which field is the action
-    -- func overrides key, new key overrides default key
-    local next = def.next_func or def.next_key or def.next
-    local prev = def.prev_func or def.prev_key or def.prev
-
-    -- maintain the current direction, so if moving backwards, next continues backwards
-    local forward = reverse and prev or next
-    local backward = reverse and next or prev
-
+M.remember = function(key, forward, backward)
     return function()
         -- this is inline with all motions, so do as little as possible here
 
         -- get surrounding context for the motion
         local count = vim.v.count
-        local pending_chars = nil
-        if def.pending then
-            -- this motion has operator pending mode, so get those chars
-            pending_chars = vim.fn.nr2char(vim.fn.getchar())
-        end
 
         local current_motion = state.update_last({
             count = count,
-            pending_chars = pending_chars,
-            forward = M.as_exec(forward, count, pending_chars),
-            backward = M.as_exec(backward, count, pending_chars),
+            pending_chars = "",
+            forward = M.with_count(forward, count),
+            backward = M.with_count(backward, count),
 
             name = key,
-            command = def.command,
-            pending = def.pending,
+            command = "",
+            pending = false,
             searching = false, -- assume false to begin with
         })
 
-        if not def.command then
-            -- commands are detected with hooks, so they've already been called
-            current_motion.forward()
-        end
+        current_motion.forward()
     end
 end
 

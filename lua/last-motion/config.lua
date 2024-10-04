@@ -50,7 +50,7 @@ return {
         { command = "?", next = "n", prev = "N" },
     },
 
-    definitions = {
+    functions = {
         -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
         -- local search = require("last-motion.search") -- import is required
         {
