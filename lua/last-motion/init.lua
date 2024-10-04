@@ -11,29 +11,36 @@ local M = {}
 
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
---- register a motion, creates new keymaps by default
+--- get next/prev for function motions
+--- @param next string: name of next function
+--- @param prev string: name of prev function
+--- @param next_func function: the function to execute when next is called
+--- @param prev_func function: the function to execute when prev is called
 --- @return table: next and prev functions which can be used in keymaps
-M.register_func = function(next, prev, next_func, prev_func)
-    -- add new keymaps, these are required to replace existing behaviour
-    -- this is how motions are remembered
+M.func_motion = function(next, prev, next_func, prev_func)
     return {
-        next = utils.remember(next, next_func, prev_func),
-        prev = utils.remember(prev, prev_func, next_func),
+        next = utils.remember_func(next, next_func, prev_func),
+        prev = utils.remember_func(prev, prev_func, next_func),
     }
 end
 
-M.register_basic_key = function(next_key, prev_key, is_pending)
+--- get next/prev for existing keys
+--- @param next_key string: keys for motion
+--- @param prev_key string: keys for reverse motion
+--- @param is_pending boolean: whether this motion is in operator pending mode
+--- @return table: next and prev functions which can be used in keymaps
+M.key_motion = function(next_key, prev_key, is_pending)
     return {
         next = utils.remember_basic_key(next_key, prev_key, is_pending),
         prev = utils.remember_basic_key(prev_key, next_key, is_pending),
     }
 end
 
---- register a command
+--- get next/prev for motions which trigger CmdlineLeave event
 --- @param command string: the command to register
 --- @param next string: the next keymap to use
 --- @param prev string: the previous keymap to use
-M.register_command = function(command, next, prev)
+M.cmd_motion = function(command, next, prev)
     local mem_next = utils.remember_basic_key(next, prev, false)
     local mem_prev = utils.remember_basic_key(prev, next, false)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
@@ -104,29 +111,28 @@ M.setup = function(opts)
 
     local noremap = { noremap = true, silent = true }
     for _, def in ipairs(M.config.basic_keys) do
-        local mem = M.register_basic_key(def.next, def.prev, false)
+        local mem = M.key_motion(def.next, def.prev, false)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
     for _, def in ipairs(M.config.pending) do
-        local mem = M.register_basic_key(def.next, def.prev, true)
+        local mem = M.key_motion(def.next, def.prev, true)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
     for _, def in ipairs(M.config.commands) do
-        -- this is really just for search, as we replace n and N
-        local mem = M.register_command(def.command, def.next, def.prev)
+        local mem = M.cmd_motion(def.command, def.next, def.prev)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
     for _, def in ipairs(M.config.functions) do
-        local mem = M.register_func(def.next, def.prev, def.next_func, def.prev_func)
+        local mem = M.func_motion(def.next, def.prev, def.next_func, def.prev_func)
 
         local desc = { desc = def.desc, noremap = true, silent = true }
         vim.keymap.set({ "n", "v" }, def.next, mem.next, desc)

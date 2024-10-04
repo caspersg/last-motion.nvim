@@ -33,36 +33,12 @@ M.with_count = function(action, count)
     end
 end
 
---- remember this motion so it can be repeated
---- @param key string: the key that triggered the motion
---- @return function: the closure to remember the motion
-M.remember = function(key, forward, backward)
-    return function()
-        -- this is inline with all motions, so do as little as possible here
-
-        -- get surrounding context for the motion
-        local count = vim.v.count
-
-        local current_motion = state.update_last({
-            count = count,
-            pending_chars = "",
-            forward = M.with_count(forward, count),
-            backward = M.with_count(backward, count),
-
-            name = key,
-            command = "",
-            pending = false,
-            searching = false, -- assume false to begin with
-        })
-
-        current_motion.forward()
-    end
-end
-
-M.exec_basic_key = function(action)
+--- execute a basic key sequence
+--- @param cmd_str string: the exact keys for the motion
+M.exec_basic_key = function(cmd_str)
     -- it's a raw set of keys to execute
-    local cmd = vim.api.nvim_replace_termcodes(action, true, true, true)
-    if string.find(action, "<C%-i>") then
+    local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
+    if string.find(cmd_str, "<C%-i>") then
         -- C-i is a special case, it's the same as tab, so it requires feedkeys
         vim.api.nvim_feedkeys(cmd, "n", true)
     else
@@ -70,6 +46,8 @@ M.exec_basic_key = function(action)
     end
 end
 
+--- execute a basic key sequence or a function
+--- @param action string|function: the exact keys for the motion or function to execute
 M.exec_action = function(action)
     if type(action) == "string" then
         M.exec_basic_key(action)
@@ -80,6 +58,11 @@ M.exec_action = function(action)
     end
 end
 
+--- remember this basic key so it can be repeated
+--- @param forward string: the forward keys
+--- @param backward string: the backwards keys
+--- @param is_pending boolean: whether this motion is in operator pending mode
+--- @return function: the closure to be used in a keymap
 M.remember_basic_key = function(forward, backward, is_pending)
     return function()
         -- this is inline with all motions, so do as little as possible here
@@ -108,6 +91,34 @@ M.remember_basic_key = function(forward, backward, is_pending)
 
         --
         M.exec_basic_key(count_forward)
+    end
+end
+
+--- remember this motion so it can be repeated
+--- @param key string: the key that triggered the motion
+--- @param forward function: the function to execute the motion
+--- @param backward function: the function to execute the motion in reverse
+--- @return function: the closure to be used in a keymap
+M.remember_func = function(key, forward, backward)
+    return function()
+        -- this is inline with all motions, so do as little as possible here
+
+        -- get surrounding context for the motion
+        local count = vim.v.count
+
+        local current_motion = state.update_last({
+            count = count,
+            pending_chars = "",
+            forward = M.with_count(forward, count),
+            backward = M.with_count(backward, count),
+
+            name = key,
+            command = "",
+            pending = false,
+            searching = false, -- assume false to begin with
+        })
+
+        current_motion.forward()
     end
 end
 
