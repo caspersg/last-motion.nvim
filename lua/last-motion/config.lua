@@ -9,11 +9,11 @@ return {
     -- Ideally this would have every pair of motions
     -- it doesn't matter which key in a pair is next or prev, as direction is preserved
 
-    basic_keys = {
-        -- for just basic keys
-        -- with just next and prev, those keys should behave as normal
-        -- as they will be replaced with new keymaps, that just call those keys and remember the motion
-
+    --- motions that have existing keymaps
+    --- for just basic keys
+    --- with just next and prev, those keys should behave as normal
+    --- as they will be replaced with new keymaps, that just call those keys and remember the motion
+    key_motions = {
         { next = "w", prev = "b" },
         { next = "W", prev = "B" },
         { next = "}", prev = "{" },
@@ -36,33 +36,39 @@ return {
         { next = "G", prev = "gg" },
     },
 
-    pending = {
+    --- motions that are operator pending
+    pending_key_motions = {
         -- use pending for operator pending keys, so it will wait until the following key is entered
         -- maybe it's only a special case for fFtT ?
         { next = "f", prev = "F" },
         { next = "t", prev = "T" },
     },
 
-    commands = {
+    --- motions that trigger CmdLineLeave events, pretty much just search
+    cmd_motions = {
         -- search has a few special cases
         -- uses command for keys that are a special case that don't need to create new keymaps
         { command = "/", next = "n", prev = "N" },
         { command = "?", next = "n", prev = "N" },
     },
 
-    functions = {
-        -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
-        -- local search = require("last-motion.search") -- import is required
+    --- motions that are called with functions
+    --- desc is to work with which-key
+    --- next/prev are just used as the name of the motion for history
+    --- new keymaps are assumed to use [ and ] prefixes, inspired by vim-unimpaired
+    func_motions = {
         {
+            -- search has existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
+            -- local search = require("last-motion.search") -- import is required
             desc = "search",
             next = "*",
             prev = "#",
             next_func = search.next_search,
             prev_func = search.prev_search,
         },
-        -- adds key to get back to recent search results after other movements
-        -- this is needed if you override n and N with repeating motions
         {
+            -- adds key to get back to recent search results after other movements
+            -- this is needed if you override n and N with repeating motions
             desc = "recent [s]earch",
             next = "]s",
             prev = "[s",
@@ -70,10 +76,7 @@ return {
             prev_func = search.prev_for_recent_search,
         },
 
-        -- use next_key and prev_key when there's existing keys to override
-        -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired
-        -- desc is to work with which-key
-        -- use next_func and prev_func when there's a function to call instead of a key
+        -- these will be default keymaps soon, so could be moved to key_motions
         {
             desc = "[d]iagnostic",
             next = "]d",
@@ -81,7 +84,6 @@ return {
             next_func = vim.diagnostic.goto_next,
             prev_func = vim.diagnostic.goto_prev,
         },
-
         {
             desc = "[q]uickfix item",
             next = "]q",
@@ -96,6 +98,7 @@ return {
             next_func = vim.cmd.bnext,
             prev_func = vim.cmd.bprevious,
         },
+
         {
             desc = "[t]ab",
             next = "]t",

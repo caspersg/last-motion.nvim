@@ -110,28 +110,28 @@ M.setup = function(opts)
     state.max_motions = M.config.max_motions
 
     local noremap = { noremap = true, silent = true }
-    for _, def in ipairs(M.config.basic_keys) do
+    for _, def in ipairs(M.config.key_motions) do
         local mem = M.key_motion(def.next, def.prev, false)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
-    for _, def in ipairs(M.config.pending) do
+    for _, def in ipairs(M.config.pending_key_motions) do
         local mem = M.key_motion(def.next, def.prev, true)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
-    for _, def in ipairs(M.config.commands) do
+    for _, def in ipairs(M.config.cmd_motions) do
         local mem = M.cmd_motion(def.command, def.next, def.prev)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
-    for _, def in ipairs(M.config.functions) do
+    for _, def in ipairs(M.config.func_motions) do
         local mem = M.func_motion(def.next, def.prev, def.next_func, def.prev_func)
 
         local desc = { desc = def.desc, noremap = true, silent = true }
