@@ -136,6 +136,12 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
   end
 
+  if M.config.default_next_previous_keys then
+    -- Add keymaps for at least forward and backward to do anything useful.
+    vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion" })
+    vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion" })
+  end
+
   -- extra keymaps for [ ] consistency
   vim.keymap.set({ "n", "v" }, "]l", "zj", { desc = "fo[l]d", remap = true })
   vim.keymap.set({ "n", "v" }, "[l", "zk", { desc = "fo[l]d", remap = true })

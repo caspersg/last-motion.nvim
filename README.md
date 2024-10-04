@@ -39,10 +39,6 @@ TODO add usage and a video
     lm.setup({
         -- empty to keep default config
     })
-
-    -- Add keymaps for at least forward and backward to do anything useful.
-    vim.keymap.set({ "n", "v" }, "n", lm.forward, { desc = "repeat last motion", noremap = true, silent = true })
-    vim.keymap.set({ "n", "v" }, "N", lm.backward, { desc = "reverse last motion", noremap = true, silent = true })
   end
 }
 
@@ -86,6 +82,8 @@ local utils = require("last-motion.utils")
 require("last-motion").setup({
   -- how many motions to remember
   max_motions = 10,
+  -- use n and N for next and previous
+  default_next_previous_keys = true,
 
   -- Ideally this would have every pair of motions
   -- it doesn't matter which key in a pair is next or prev, as direction is preserved
@@ -310,12 +308,17 @@ If you don't want to use any of the default configurations or keymaps, you can r
 ```lua
 require("last-motion").setup({
   max_motions = 10,
+  default_next_previous_keys = false,
   key_motions = {},
   pending_key_motions = {},
   cmd_motions = {},
   func_motions = {},
 })
+-- Add keymaps for at least forward and backward to do anything useful.
+vim.keymap.set({ "n", "v" }, "n", require("last-motion").forward, { desc = "repeat last motion" })
+vim.keymap.set({ "n", "v" }, "N", require("last-motion").backward, { desc = "reverse last motion" })
 
+-- add your own keymaps
 local mem = require("last-motion").func_motion(
   -- it needs names for next/prev to be shown in the history
   "]T",

@@ -5,6 +5,8 @@ local utils = require("last-motion.utils")
 return {
   -- how many motions to remember
   max_motions = 10,
+  -- use n and N for next and previous
+  default_next_previous_keys = true,
 
   -- Ideally this would have every pair of motions
   -- it doesn't matter which key in a pair is next or prev, as direction is preserved
