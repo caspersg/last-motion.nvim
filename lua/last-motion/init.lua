@@ -12,22 +12,24 @@ local M = {}
 local group = vim.api.nvim_create_augroup("last-motion", {})
 
 --- register a command
---- @param def Definition: a command definition
-local function register_command(def)
-    local next = utils.remember(def.command, def, false)
-    local prev = utils.remember(def.command, def, true)
+--- @param command string: the command to register
+--- @param next string: the next keymap to use
+--- @param prev string: the previous keymap to use
+M.register_command = function(command, next, prev)
+    local mem_next = utils.remember_basic_key(next, prev, false)
+    local mem_prev = utils.remember_basic_key(prev, next, false)
     vim.api.nvim_create_autocmd("CmdlineLeave", {
         group = group,
         callback = function()
-            if not vim.v.event.abort and vim.fn.expand("<afile>") == def.command then
+            if not vim.v.event.abort and vim.fn.expand("<afile>") == command then
                 -- call the closure immediately
-                next()
+                mem_next()
             end
         end,
     })
     return {
-        next = next,
-        prev = prev,
+        next = mem_next,
+        prev = mem_prev,
     }
 end
 
@@ -36,11 +38,6 @@ end
 --- @param skip_keymaps? boolean: skip adding keymaps, if true you must use the returned functions for your own keymaps, otherwise nothing will work
 --- @return table: next and prev functions which can be used in keymaps
 M.register = function(def, skip_keymaps)
-    if def.command then
-        return register_command(def)
-        -- commands are a hook, so we don't need a new keymap
-    end
-
     -- add new keymaps, these are required to replace existing behaviour
     -- this is how motions are remembered
     local mapopts = { desc = def.desc, noremap = true, silent = true }
@@ -128,6 +125,14 @@ M.setup = function(opts)
 
     for _, def in ipairs(M.config.pending) do
         local mem = M.register_basic_key(def.next, def.prev, true)
+
+        vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
+        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
+    end
+
+    for _, def in ipairs(M.config.commands) do
+        -- this is really just for search, as we replace n and N
+        local mem = M.register_command(def.command, def.next, def.prev)
 
         vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
         vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)

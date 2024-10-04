@@ -43,7 +43,7 @@ return {
         { next = "t", prev = "T" },
     },
 
-    command = {
+    commands = {
         -- search has a few special cases
         -- uses command for keys that are a special case that don't need to create new keymaps
         { command = "/", next = "n", prev = "N" },
