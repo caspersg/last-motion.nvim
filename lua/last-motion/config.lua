@@ -36,26 +36,43 @@ return {
         { next = "G", prev = "gg" },
     },
 
+    pending = {
+        -- use pending for operator pending keys, so it will wait until the following key is entered
+        -- maybe it's only a special case for fFtT ?
+        { next = "f", prev = "F" },
+        { next = "t", prev = "T" },
+    },
+
+    command = {
+        -- search has a few special cases
+        -- uses command for keys that are a special case that don't need to create new keymaps
+        { command = "/", next = "n", prev = "N" },
+        { command = "?", next = "n", prev = "N" },
+    },
+
     definitions = {
+        -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
+        -- local search = require("last-motion.search") -- import is required
+        {
+            desc = "search",
+            next = "*",
+            prev = "#",
+            next_func = search.next_search,
+            prev_func = search.prev_search,
+        },
+        -- adds key to get back to recent search results after other movements
+        -- this is needed if you override n and N with repeating motions
+        {
+            desc = "recent [s]earch",
+            next = "]s",
+            prev = "[s",
+            next_func = search.next_for_recent_search,
+            prev_func = search.prev_for_recent_search,
+        },
 
         -- use next_key and prev_key when there's existing keys to override
         -- new keymaps are with [ and ] prefixes, inspired by vim-unimpaired
         -- desc is to work with which-key
-        -- {
-        --     desc = "fo[l]d",
-        --     next = "]l",
-        --     prev = "[l",
-        --     next_key = "zj",
-        --     prev_key = "zk",
-        -- },
-        -- {
-        --     desc = "[w]indow",
-        --     next = "]w",
-        --     prev = "[w",
-        --     next_key = "<C-w>w",
-        --     prev_key = "<C-w>W",
-        -- },
-        --
         -- use next_func and prev_func when there's a function to call instead of a key
         {
             desc = "[d]iagnostic",
@@ -85,34 +102,6 @@ return {
             prev = "[t",
             next_func = vim.cmd.tabnext,
             prev_func = vim.cmd.tabprevious,
-        },
-
-        -- use pending for operator pending keys, so it will wait until the following key is entered
-        -- maybe it's only a special case for fFtT ?
-        { next = "f", prev = "F", pending = true },
-        { next = "t", prev = "T", pending = true },
-
-        -- search has a few special cases
-        -- uses command for keys that are a special case that don't need to create new keymaps
-        { command = "/", next = "n", prev = "N" },
-        { command = "?", next = "n", prev = "N" },
-        -- existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
-        -- local search = require("last-motion.search") -- import is required
-        {
-            desc = "search",
-            next = "*",
-            prev = "#",
-            next_func = search.next_search,
-            prev_func = search.prev_search,
-        },
-        -- adds key to get back to recent search results after other movements
-        -- this is needed if you override n and N with repeating motions
-        {
-            desc = "recent [s]earch",
-            next = "]s",
-            prev = "[s",
-            next_func = search.next_for_recent_search,
-            prev_func = search.prev_for_recent_search,
         },
 
         -- treesitter functions that are builtin to neovim

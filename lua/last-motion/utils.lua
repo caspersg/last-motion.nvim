@@ -116,20 +116,25 @@ M.exec_action = function(action)
     end
 end
 
-M.remember_basic_key = function(forward, backward)
+M.remember_basic_key = function(forward, backward, is_pending)
     return function()
         -- this is inline with all motions, so do as little as possible here
 
         -- get surrounding context for the motion
         local count = vim.v.count
         local countstr = count > 0 and count or ""
-        local count_forward = countstr .. forward
+        local pending_chars = ""
+        if is_pending then
+            -- this motion has operator pending mode, so get those chars
+            pending_chars = vim.fn.nr2char(vim.fn.getchar())
+        end
+        local count_forward = countstr .. forward .. pending_chars
 
         state.update_last({
             count = count,
             pending_chars = "",
             forward = count_forward,
-            backward = countstr .. backward,
+            backward = countstr .. backward .. pending_chars,
 
             name = forward,
             command = "",

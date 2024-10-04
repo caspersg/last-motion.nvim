@@ -60,10 +60,10 @@ M.register = function(def, skip_keymaps)
     }
 end
 
-M.register_basic_key = function(next_key, prev_key)
+M.register_basic_key = function(next_key, prev_key, is_pending)
     return {
-        next = utils.remember_basic_key(next_key, prev_key),
-        prev = utils.remember_basic_key(prev_key, next_key),
+        next = utils.remember_basic_key(next_key, prev_key, is_pending),
+        prev = utils.remember_basic_key(prev_key, next_key, is_pending),
     }
 end
 
@@ -118,12 +118,19 @@ M.setup = function(opts)
 
     state.max_motions = M.config.max_motions
 
+    local noremap = { noremap = true, silent = true }
     for _, def in ipairs(M.config.basic_keys) do
-        local mem = M.register_basic_key(def.next, def.prev)
+        local mem = M.register_basic_key(def.next, def.prev, false)
 
-        local mapopts = { noremap = true, silent = true }
-        vim.keymap.set({ "n", "v" }, def.next, mem.next, mapopts)
-        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, mapopts)
+        vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
+        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
+    end
+
+    for _, def in ipairs(M.config.pending) do
+        local mem = M.register_basic_key(def.next, def.prev, true)
+
+        vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
+        vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
     end
 
     for _, def in ipairs(M.config.definitions) do
