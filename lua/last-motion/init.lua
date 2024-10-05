@@ -151,6 +151,14 @@ M.setup = function(opts)
   vim.api.nvim_create_user_command("LastMotionsNotify", function()
     vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
   end, {})
+
+  vim.api.nvim_create_user_command("LastMotionsForward", function(cmd_opts)
+    M.forward(tonumber(cmd_opts.args))
+  end, { nargs = "?", desc = "repeat the specified, or last motion" })
+
+  vim.api.nvim_create_user_command("LastMotionsBackward", function(cmd_opts)
+    M.backward(tonumber(cmd_opts.args))
+  end, { nargs = "?", desc = "repeat the specified, or last motion in reverse" })
 end
 
 return M
