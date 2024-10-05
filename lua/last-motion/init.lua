@@ -57,35 +57,27 @@ M.cmd_motion = function(command, next, prev)
   }
 end
 
-local function repeat_motion(motion, direction)
-  if motion then
-    -- count specific to the repeat, so multiplies with the original count
-    local count = vim.v.count
-    for _ = 1, math.max(count, 1) do
-      local keys = motion[direction .. "_keys"]
-      if keys then
-        utils.exec_keys(keys)
-      else
-        motion[direction .. "_func"]()
-      end
-    end
-  end
-end
-
 -- repeat the last motion, with count
 M.forward = function()
-  repeat_motion(state.last(), "forward")
+  local motion = state.get(0)
+  if motion then
+    motion:forward()
+  end
 end
 
 -- repeat the last motion in reverse, with count
 M.backward = function()
-  repeat_motion(state.last(), "backward")
+  local motion = state.get(0)
+  if motion then
+    motion:backward()
+  end
 end
 
--- repeat motion at offset with count, 0 is more recent, 9 is oldest
--- @param offset number: the offset into the history
+--- get the motion at offset, 0 is most recent, 9 is oldest when default is 10
+--- @param offset number: the offset into the history 0 indexed
+--- @return Motion: the motion at the offset
 M.nth = function(offset)
-  repeat_motion(state.get(offset), "forward")
+  return state.get(offset)
 end
 
 --- get the latest motions

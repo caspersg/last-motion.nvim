@@ -4,14 +4,14 @@ local state = require("last-motion.state")
 local M = {}
 
 local function set_searching()
-  if state.last() then
+  if state.get(0) then
     -- store this on last, as it automatically gets reset
-    state.last().searching = true
+    state.get(0).searching = true
   end
 end
 
 local function is_searching()
-  return state.last() and state.last().searching
+  return state.get(0) and state.get(0).searching
 end
 
 --- The same as default behaviour of * and n/N, but in one function

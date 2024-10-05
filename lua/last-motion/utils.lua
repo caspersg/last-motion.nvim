@@ -17,7 +17,7 @@ end
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()
-  vim.notify("last motion" .. vim.inspect(state.last()))
+  vim.notify("last motion" .. vim.inspect(state.get(0)))
 end
 
 --- add count to a motion to make it repeatable with count
@@ -30,19 +30,6 @@ M.with_count = function(action, count)
     for _ = 1, math.max(count, 1) do
       action()
     end
-  end
-end
-
---- execute a basic key sequence
---- @param cmd_str string: the exact keys for the motion
-M.exec_keys = function(cmd_str)
-  -- it's a raw set of keys to execute
-  local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-  if string.find(cmd_str, "<C%-i>") then
-    -- C-i is a special case, it's the same as tab, so it requires feedkeys
-    vim.api.nvim_feedkeys(cmd, "n", true)
-  else
-    vim.cmd("normal! " .. cmd)
   end
 end
 
@@ -66,14 +53,14 @@ M.remember_key = function(forward, backward, is_pending, is_cmd)
     end
     local count_forward = countstr .. forward .. pending_chars
 
-    state.update_last({
+    local motion = state.update_last({
       name = count_forward,
       forward_keys = count_forward,
       backward_keys = countstr .. backward .. pending_chars,
     })
 
     if not is_cmd then
-      M.exec_keys(count_forward)
+      motion:forward()
     end
   end
 end

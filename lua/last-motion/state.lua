@@ -19,18 +19,17 @@ M.update_last = function(motion)
   return new_motion
 end
 
---- get the most recent motion
---- @return Motion: the most recent motion
-M.last = function()
-  return M.get(0)
-end
-
 --- get the nth motion, 0 is the most recent, 9 is the oldest
 --- @param offset number: the offset from the most recent motion
 --- @return Motion: the motion at the offset
 M.get = function(offset)
   local index = offset + 1
   return M.history[index]
+end
+
+--- pop the most recent motion
+M.pop = function()
+  return table.remove(M.history, 0)
 end
 
 return M
