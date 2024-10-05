@@ -51,14 +51,12 @@ I also add these keymaps, which assume [ and ] prefixes from the default config
 ```lua
 -- I add keymaps for repeating numbered motions from the history, default is 0-9
 for i = 0, 9 do
-  for _, dir in ipairs({ { "]", "forward" }, { "[", "backward" } }) do
-    vim.keymap.set({ "n", "v" }, dir[1] .. i, function()
-      local motion = lm.nth(i)
-      if motion then
-        motion[dir[2]](motion)
-      end
-    end, { desc = "repeat " .. i })
-  end
+  vim.keymap.set({ "n", "v" }, "]" .. i, function()
+    lm.forward(i)
+  end, { desc = "repeat " .. i })
+  vim.keymap.set({ "n", "v" }, "[" .. i, function()
+    lm.backward(i)
+  end, { desc = "repeat " .. i })
 end
 
 vim.keymap.set("n", "],", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })

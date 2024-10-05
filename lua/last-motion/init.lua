@@ -58,27 +58,28 @@ M.cmd_motion = function(command, next, prev)
   }
 end
 
--- repeat the last motion, with count
-M.forward = function()
-  local motion = state.get(0)
+--- repeat the last motion, with count
+--- @param offset? number: the offset into the history 0-indexed default is 0
+M.forward = function(offset)
+  if not offset then
+    offset = 0
+  end
+  local motion = state.get(offset)
   if motion then
     motion:forward()
   end
 end
 
--- repeat the last motion in reverse, with count
-M.backward = function()
-  local motion = state.get(0)
+--- repeat the last motion in reverse, with count
+--- @param offset? number: the offset into the history 0-indexed default is 0
+M.backward = function(offset)
+  if not offset then
+    offset = 0
+  end
+  local motion = state.get(offset)
   if motion then
     motion:backward()
   end
-end
-
---- get the motion at offset, 0 is most recent, 9 is oldest when default is 10
---- @param offset number: the offset into the history 0-indexed
---- @return Motion: the motion at the offset
-M.nth = function(offset)
-  return state.get(offset)
 end
 
 --- get the raw array of motion history
