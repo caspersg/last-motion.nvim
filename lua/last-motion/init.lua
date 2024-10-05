@@ -142,12 +142,6 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion" })
   end
 
-  -- extra keymaps for [ ] consistency
-  vim.keymap.set({ "n", "v" }, "]l", "zj", { desc = "fo[l]d", remap = true })
-  vim.keymap.set({ "n", "v" }, "[l", "zk", { desc = "fo[l]d", remap = true })
-  vim.keymap.set({ "n", "v" }, "]w", "<C-w>w", { desc = "[w]indow", remap = true })
-  vim.keymap.set({ "n", "v" }, "[w", "<C-w>W", { desc = "[w]indow", remap = true })
-
   vim.api.nvim_create_user_command("LastMotionsNotify", function()
     vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
   end, {})

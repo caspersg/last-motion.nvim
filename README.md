@@ -49,6 +49,12 @@ TODO add usage and a video
 I also add these keymaps, which assume [ and ] prefixes from the default config
 
 ```lua
+-- extra keymaps for [ ] consistency
+vim.keymap.set({ "n", "v" }, "]l", "zj", { desc = "fo[l]d", remap = true })
+vim.keymap.set({ "n", "v" }, "[l", "zk", { desc = "fo[l]d", remap = true })
+vim.keymap.set({ "n", "v" }, "]w", "<C-w>w", { desc = "[w]indow", remap = true })
+vim.keymap.set({ "n", "v" }, "[w", "<C-w>W", { desc = "[w]indow", remap = true })
+
 -- I add keymaps for repeating numbered motions from the history, default is 0-9
 for i = 0, 9 do
   vim.keymap.set({ "n", "v" }, "]" .. i, function()
