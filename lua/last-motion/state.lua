@@ -1,14 +1,18 @@
 local M = {
-  --- State which stores the last motions, to be repeated
+  --- State which stores the history of last motion 1-indexed
+  --- @type Motion[] history of motions
   history = {},
-  max_motions = nil,
+
+  --- The maximum number of motions to remember
+  max_motions = 1,
 }
 
 local Motion = require("last-motion.motion")
 
---- update the last motion
+--- add a new last motion
 --- @param motion Motion: the motion to remember
-M.update_last = function(motion)
+--- @return Motion: the motion that was added
+M.push_motion = function(motion)
   local new_motion = Motion.new(motion)
 
   table.insert(M.history, 1, new_motion)
@@ -20,16 +24,11 @@ M.update_last = function(motion)
 end
 
 --- get the nth motion, 0 is the most recent, 9 is the oldest
---- @param offset number: the offset from the most recent motion
+--- @param offset number: the offset from the most recent motion 0-indexed
 --- @return Motion: the motion at the offset
 M.get = function(offset)
   local index = offset + 1
   return M.history[index]
-end
-
---- pop the most recent motion
-M.pop = function()
-  return table.remove(M.history, 0)
 end
 
 return M

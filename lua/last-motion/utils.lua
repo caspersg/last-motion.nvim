@@ -53,7 +53,7 @@ M.remember_key = function(forward, backward, is_pending, is_cmd)
     end
     local count_forward = countstr .. forward .. pending_chars
 
-    local motion = state.update_last({
+    local motion = state.push_motion({
       name = count_forward,
       forward_keys = count_forward,
       backward_keys = countstr .. backward .. pending_chars,
@@ -79,7 +79,7 @@ M.remember_func = function(key, forward, backward)
     local countstr = count > 0 and count or ""
     local count_forward = M.with_count(forward, count)
 
-    state.update_last({
+    state.push_motion({
       name = countstr .. key,
       forward_func = count_forward,
       backward_func = M.with_count(backward, count),

@@ -39,6 +39,7 @@ end
 --- @param command string: the command to register
 --- @param next string: the next keymap to use
 --- @param prev string: the previous keymap to use
+--- @return table: next and prev functions which can be used in keymaps
 M.cmd_motion = function(command, next, prev)
   local mem_next = utils.remember_key(next, prev, false, true)
   local mem_prev = utils.remember_key(prev, next, false, true)
@@ -74,10 +75,16 @@ M.backward = function()
 end
 
 --- get the motion at offset, 0 is most recent, 9 is oldest when default is 10
---- @param offset number: the offset into the history 0 indexed
+--- @param offset number: the offset into the history 0-indexed
 --- @return Motion: the motion at the offset
 M.nth = function(offset)
   return state.get(offset)
+end
+
+--- get the raw array of motion history
+--- @return table: the history of motions 1-indexed
+M.history = function()
+  return state.history
 end
 
 --- get the latest motions
