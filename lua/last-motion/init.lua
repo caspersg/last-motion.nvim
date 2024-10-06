@@ -136,6 +136,14 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
   end
 
+  for _, def in ipairs(M.config.treesitter_motions) do
+    local mem = M.func_motion(def.next, def.prev, def.next_func, def.prev_func)
+
+    local desc = { desc = def.desc, noremap = true, silent = true }
+    vim.keymap.set({ "n", "v" }, def.next, mem.next, desc)
+    vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
+  end
+
   if M.config.default_next_previous_keys then
     -- Add keymaps for at least forward and backward to do anything useful.
     vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion" })

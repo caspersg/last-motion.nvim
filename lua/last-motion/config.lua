@@ -119,9 +119,11 @@ return {
       next_func = vim.cmd.tabnext,
       prev_func = vim.cmd.tabprevious,
     },
+  },
 
-    -- treesitter functions that are builtin to neovim
-    -- local utils = require("last-motion.utils") -- import is required
+  --- treesitter functions that are builtin to neovim
+  --- local utils = require("last-motion.utils") -- import is required
+  treesitter_motions = {
     {
       desc = "[a]ttribute",
       next = "]a",

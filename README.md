@@ -224,8 +224,11 @@ require("last-motion").setup({
       prev_func = vim.cmd.tabprevious,
     },
 
-    -- treesitter functions that are builtin to neovim
-    -- local utils = require("last-motion.utils") -- import is required
+  },
+
+  --- treesitter functions that are builtin to neovim
+  --- local utils = require("last-motion.utils") -- import is required
+  treesitter_motions = {
     {
       desc = "[a]ttribute",
       next = "]a",
@@ -351,6 +354,7 @@ require("last-motion").setup({
   pending_key_motions = {},
   cmd_motions = {},
   func_motions = {},
+  treesitter_motions = {},
 })
 -- Add keymaps for at least forward and backward to do anything useful.
 vim.keymap.set({ "n", "v" }, "n", require("last-motion").forward, { desc = "repeat last motion" })
