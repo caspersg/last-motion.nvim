@@ -350,5 +350,5 @@ vim.keymap.set({ "n", "v" }, "[T", mem.prev, { desc = "[T]odo" })
 
 ## Inspirations
 
-- [vim-unimpaired](https://github.com/tpope/vim-unimpaired)
 - [nvim-better-n](https://github.com/jonatan-branting/nvim-better-n)
+- [vim-unimpaired](https://github.com/tpope/vim-unimpaired)
