@@ -24,6 +24,7 @@ return {
     { next = "E", prev = "gE" },
     { next = "h", prev = "l" },
     { next = "j", prev = "k" },
+    { next = "]m", prev = "[m", desc = "[m]ethod" },
 
     -- next and prev can process control keys too
     { next = "<C-d>", prev = "<C-u>" },
