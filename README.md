@@ -21,7 +21,7 @@ Some uses:
 I've done my best to add every motion in neovim, including treesitter motions like "@attribute.inner".
 hjkl seem pretty pointless to include, but you can repeat '10j' with 'n', go back up by 10 lines with N.
 
-TODO add usage and a video
+TODO add  a video
 
 ## Installation
 
@@ -44,7 +44,7 @@ TODO add usage and a video
 
 ```
 
-### Additional keymaps
+### Recommended keymaps
 
 I also add these keymaps, which assume [ and ] prefixes from the default config
 
@@ -65,10 +65,11 @@ for i = 0, 9 do
   end, { desc = "repeat " .. i })
 end
 
-vim.keymap.set("n", "],", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })
 
 -- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
 vim.keymap.set("n", ",", "]", { remap = true })
+
+vim.keymap.set("n", ",,", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })
 
 -- if you want to directly manipulate history, you can get the 1-indexed underlying array
 -- eg pop the last motion
@@ -77,14 +78,38 @@ table.remove(require("last-motion").history(), 1)
 
 ## Usage
 
-TODO
+This assumes the recommended keymaps.
+
+Move around with a motion eg `2}`
+
+view motion history `,,`
+
+repeat the last motion `n`
+
+reverse the last motion `N`
+
+repeat numbered motion from history `]5`
+
+add a count prefix to a repeat `3n`
+
+### Ex commands
+vim.notify the motion history `:LastMotionsNotify`
+
+repeat last motion `:LastMotionsForward`
+
+reverse last motion `:LastMotionsBackward`
+
+repeat motion at offset 0-indexed `:LastMotionsForward 4`
+
+reverse motion at offset 0-indexed `:LastMotionsBackward 4`
+
 
 
 ## Default Configuration
 
 The default config has definitions for all the builtin motions I could figure out.
 
-Some of the definitions need to import helper functions that you'll need to import.
+Some of the definitions need to import helper functions.
 
 
 ```lua
