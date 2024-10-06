@@ -28,7 +28,6 @@ return {
     -- next and prev can process control keys too
     { next = "<C-d>", prev = "<C-u>" },
     { next = "<C-f>", prev = "<C-b>" },
-    { next = "<C-i>", prev = "<C-o>" },
     { next = "zj", prev = "zk" },
     { next = "<C-w>w", prev = "<C-w>W" },
 
@@ -55,14 +54,26 @@ return {
   },
 
   --- motions that are called with functions
-  --- desc is to work with which-key
+  --- desc is only to work with which-key
   --- next/prev are just used as the name of the motion for history
   --- new keymaps are assumed to use [ and ] prefixes, inspired by vim-unimpaired
   func_motions = {
     {
+      next = "<C-i>",
+      prev = "<C-o>",
+      next_func = function()
+        -- C-i is a special case, it's the same as tab, so it requires feedkeys
+        local cmd = vim.api.nvim_replace_termcodes("<C-i>", true, true, true)
+        vim.api.nvim_feedkeys(cmd, "n", true)
+      end,
+      prev_func = function()
+        local cmd = vim.api.nvim_replace_termcodes("<C-o>", true, true, true)
+        vim.cmd("normal! " .. cmd)
+      end,
+    },
+    {
       -- search has existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
       -- local search = require("last-motion.search") -- import is required
-      desc = "search",
       next = "*",
       prev = "#",
       next_func = search.next_search,

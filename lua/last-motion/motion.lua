@@ -31,12 +31,7 @@ end
 local function exec_keys(cmd_str)
   -- it's a raw set of keys to execute
   local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-  if string.find(cmd_str, "<C%-i>") then
-    -- C-i is a special case, it's the same as tab, so it requires feedkeys
-    vim.api.nvim_feedkeys(cmd, "n", true)
-  else
-    vim.cmd("normal! " .. cmd)
-  end
+  vim.cmd("normal! " .. cmd)
 end
 
 function Motion:repeat_motion(direction)
