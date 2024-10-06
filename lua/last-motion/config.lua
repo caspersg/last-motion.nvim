@@ -8,7 +8,7 @@ return {
   -- if true, imports keymaps from caspersg/square-motions.nvim
   square_motions = true,
   -- if true, imports textobject keymaps from caspersg/square-motions.nvim
-  use_textobject_keymaps = true,
+  textobjects = true,
 
   -- Ideally this would have every pair of motions
   -- it doesn't matter which key in a pair is next or prev, as direction is preserved

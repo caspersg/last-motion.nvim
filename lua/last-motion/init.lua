@@ -103,13 +103,23 @@ M.setup_square_motions = function(motions)
   local sm = require("square-motions")
 
   for _, to in ipairs(motions) do
-    local next = sm.config.next .. to.key
-    local prev = sm.config.prev .. to.key
-    local mem = M.key_motion(next, prev, false)
+    local next_key = sm.config.next .. to.key
+    local next = to.next or to.key
+    local prev_key = sm.config.prev .. to.key
+    local prev = to.prev or to.key
+    local mem = nil
+    if to.next_func then
+      mem = M.func_motion(next_key, prev_key, to.next_func, to.prev_func)
+    else
+      -- we should be able to map to the keys created in square-motions, without using the funcs
+      mem = M.key_motion(next, prev, false)
+    end
 
-    local desc = { desc = to.desc, remap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, next, mem.next, desc)
-    vim.keymap.set({ "n", "v" }, prev, mem.prev, desc)
+    -- vim.notify("sq '" .. to.desc .. "' '" .. next_key)
+
+    local opts = { desc = to.desc, remap = true, silent = true }
+    vim.keymap.set({ "n", "v" }, next_key, mem.next, opts)
+    vim.keymap.set({ "n", "v" }, prev_key, mem.prev, opts)
   end
 end
 
@@ -154,7 +164,7 @@ M.setup = function(opts)
 
   local sm = require("square-motions")
   if M.config.textobjects then
-    M.setup_square_motions(sm.textobjects)
+    M.setup_square_motions(sm.textobject_motions())
   end
 
   if M.config.square_motions then
