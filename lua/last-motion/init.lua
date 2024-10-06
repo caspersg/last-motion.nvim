@@ -99,37 +99,18 @@ M.get_last_motions = function()
   return table.concat(lines, "\n")
 end
 
-M.setup_treesitter = function(treesitter_motions)
-  local keymaps = {}
+M.setup_square_motions = function(motions)
+  local sm = require("square-motions")
 
-  for _, def in ipairs(treesitter_motions) do
-    -- vim.notify("ts " .. vim.inspect(def))
-    local next = "]" .. def.key
-    local prev = "[" .. def.key
-    local mem = M.func_motion(next, prev, utils.ts_next(def.query), utils.ts_prev(def.query))
+  for _, to in ipairs(motions) do
+    local next = sm.config.next .. to.key
+    local prev = sm.config.prev .. to.key
+    local mem = M.key_motion(next, prev, false)
 
-    local desc = { desc = def.desc, noremap = true, silent = true }
+    local desc = { desc = to.desc, remap = true, silent = true }
     vim.keymap.set({ "n", "v" }, next, mem.next, desc)
     vim.keymap.set({ "n", "v" }, prev, mem.prev, desc)
-
-    keymaps[def.key] = { query = def.query, desc = def.desc }
   end
-
-  -- vim.notify("keymaps " .. vim.inspect(keymaps))
-  require("nvim-treesitter.configs").setup({
-    textobjects = {
-      move = {
-        -- TODO: split this config out to a separate plugin, then just use those keymaps
-        enable = false, -- disabled in favour of this plugin
-      },
-      select = {
-        enable = true,
-        lookahead = true,
-        keymaps = keymaps,
-        include_surrounding_whitespace = false,
-      },
-    },
-  })
 end
 
 --- setup the plugin
@@ -171,7 +152,14 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
   end
 
-  M.setup_treesitter(M.config.treesitter_motions)
+  local sm = require("square-motions")
+  if M.config.textobjects then
+    M.setup_square_motions(sm.textobjects)
+  end
+
+  if M.config.square_motions then
+    M.setup_square_motions(sm.config.motions)
+  end
 
   if M.config.default_next_previous_keys then
     -- Add keymaps for at least forward and backward to do anything useful.

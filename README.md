@@ -377,7 +377,7 @@ vim.keymap.set({ "n", "v" }, "[T", mem.prev, { desc = "[T]odo" })
 
 
 
-## Inspirations
+## Similar plugins
 
 - [nvim-better-n](https://github.com/jonatan-branting/nvim-better-n)
 - [nvim-treesitter-textobjects text-objects-move](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#text-objects-move)
