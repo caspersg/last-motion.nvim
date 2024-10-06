@@ -121,117 +121,58 @@ return {
     },
   },
 
-  --- treesitter functions that are builtin to neovim
-  --- local utils = require("last-motion.utils") -- import is required
+  --- treesitter functions from nvim-treesitter-textobjects
   treesitter_motions = {
-    {
-      desc = "[a]ttribute",
-      next = "]a",
-      prev = "[a",
-      next_func = utils.ts_next("@attribute.inner"),
-      prev_func = utils.ts_prev("@attribute.inner"),
-    },
-    {
-      desc = "fram[e]",
-      next = "]e",
-      prev = "[e",
-      next_func = utils.ts_next("@frame.inner"),
-      prev_func = utils.ts_prev("@frame.inner"),
-    },
-    {
-      desc = "c[o]mment",
-      next = "]o",
-      prev = "[o",
-      next_func = utils.ts_next("@comment.outer"),
-      prev_func = utils.ts_prev("@comment.outer"),
-    },
-    {
-      desc = "bloc[k]",
-      next = "]k",
-      prev = "[k",
-      next_func = utils.ts_next("@block.inner"),
-      prev_func = utils.ts_prev("@block.inner"),
-    },
-    {
-      desc = "[r]eturn",
-      next = "]r",
-      prev = "[r",
-      next_func = utils.ts_next("@return.inner"),
-      prev_func = utils.ts_prev("@return.inner"),
-    },
-    {
-      desc = "[p]arameter",
-      next = "]p",
-      prev = "[p",
-      next_func = utils.ts_next("@parameter.inner"),
-      prev_func = utils.ts_prev("@parameter.inner"),
-    },
-    {
-      desc = "[c]all",
-      next = "]c",
-      prev = "[c",
-      next_func = utils.ts_next("@call.outer"),
-      prev_func = utils.ts_prev("@call.outer"),
-    },
-    {
-      desc = "[a]ssignment",
-      next = "]a",
-      prev = "[a",
-      next_func = utils.ts_next("@assignment.rhs"),
-      prev_func = utils.ts_prev("@assignment.rhs"),
-    },
-    {
-      desc = "co[N]ditional",
-      next = "]N",
-      prev = "[N",
-      next_func = utils.ts_next("@conditional.inner"),
-      prev_func = utils.ts_prev("@conditional.inner"),
-    },
-    {
-      desc = "[C]lass",
-      next = "]C",
-      prev = "[C",
-      next_func = utils.ts_next("@class.inner"),
-      prev_func = utils.ts_prev("@class.inner"),
-    },
-    {
-      desc = "[f]unction",
-      next = "]f",
-      prev = "[f",
-      next_func = utils.ts_next("@function.outer"),
-      prev_func = utils.ts_prev("@function.outer"),
-    },
+    -- already taken
+    -- ib iB ip is it iw iW i<brackets and quotes>
+    -- ab aB ap as at aw aW a<brackets and quotes>
 
-    -- An attempt at moving through abstract treesitter nodes
-    -- local ts_utils = require("nvim-treesitter.ts_utils") -- import is required
-    {
-      desc = "[n]ode",
-      next = "]n",
-      prev = "[n",
-      next_func = function()
-        local node = ts_utils.get_node_at_cursor()
-        if node == nil then
-          error("No Treesitter parser found.")
-          return
-        end
-        local next = ts_utils.get_next_node(node, true, false)
-        if next == nil then
-          -- vim.notify("No next node found.")
-        end
-        ts_utils.goto_node(next, true, false)
-      end,
-      prev_func = function()
-        local node = ts_utils.get_node_at_cursor()
-        if node == nil then
-          error("No Treesitter parser found.")
-          return
-        end
-        local prev = ts_utils.get_previous_node(node, true, false)
-        if prev == nil then
-          -- vim.notify("No prev node found.")
-        end
-        ts_utils.goto_node(prev, true, false)
-      end,
-    },
+    { key = "ia", desc = "[a]ssignment", query = "@assignment.inner" },
+    { key = "aa", desc = "[a]ssignment", query = "@assignment.outer" },
+    -- TODO find better keys for rhs/lhs
+    { key = "iR", desc = "assignment [R]hs", query = "@assignment.rhs" },
+    { key = "iL", desc = "assignment [L]hs", query = "@assignment.lhs" },
+
+    { key = "iA", desc = "[a]ttribute", query = "@attribute.inner" },
+    { key = "aA", desc = "[a]ttribute", query = "@attribute.outer" },
+
+    { key = "ik", desc = "bloc[k]", query = "@block.inner" },
+    { key = "ak", desc = "bloc[k]", query = "@block.outer" },
+
+    { key = "ic", desc = "[c]all", query = "@call.inner" },
+    { key = "ac", desc = "[c]all", query = "@call.outer" },
+
+    { key = "iC", desc = "[C]lass", query = "@class.inner" },
+    { key = "aC", desc = "[C]lass", query = "@class.outer" },
+
+    { key = "io", desc = "c[o]mment", query = "@comment.inner" },
+    { key = "ao", desc = "c[o]mment", query = "@comment.outer" },
+
+    { key = "in", desc = "co[n]ditional", query = "@conditional.inner" },
+    { key = "an", desc = "co[n]ditional", query = "@conditional.outer" },
+
+    { key = "ie", desc = "fram[e]", query = "@frame.inner" },
+    { key = "ae", desc = "fram[e]", query = "@frame.outer" },
+
+    { key = "if", desc = "[f]unction", query = "@function.inner" },
+    { key = "af", desc = "[f]unction", query = "@function.outer" },
+
+    { key = "il", desc = "[l]oop", query = "@loop.inner" },
+    { key = "al", desc = "[l]oop", query = "@loop.outer" },
+
+    { key = "iN", desc = "[N]umber", query = "@number.inner" },
+
+    { key = "iP", desc = "[P]arameter", query = "@parameter.inner" },
+    { key = "aP", desc = "[P]arameter", query = "@parameter.outer" },
+
+    { key = "ig", desc = "re[g]ex", query = "@regex.inner" },
+    { key = "ag", desc = "pe[g]ex", query = "@regex.outer" },
+
+    { key = "ir", desc = "[r]eturn", query = "@return.inner" },
+    { key = "ar", desc = "[r]eturn", query = "@return.outer" },
+
+    { key = "iO", desc = "sc[O]pename", query = "@scopename.inner" },
+
+    { key = "aS", desc = "[S]tatement", query = "@statement.outer" },
   },
 }
