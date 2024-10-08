@@ -38,9 +38,9 @@ return {
     { next = "G", prev = "gg" },
   },
 
-  --- motions that are operator pending
-  pending_key_motions = {
-    -- use pending for operator pending keys, so it will wait until the following key is entered
+  --- motions that wait for another char
+  read_char_motions = {
+    -- it will wait until the following key is entered
     -- maybe it's only a special case for fFtT ?
     { next = "f", prev = "F" },
     { next = "t", prev = "T" },

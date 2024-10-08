@@ -1,6 +1,5 @@
 -- try to log every motion, so we can remember and then repeat them
 -- adds count to the repeats, and maintains any existing counts
--- conditionally can deal with operator pending keys too
 
 local utils = require("last-motion.utils")
 local state = require("last-motion.state")
@@ -26,12 +25,12 @@ end
 --- get next/prev for existing keys
 --- @param next_key string: keys for motion
 --- @param prev_key string: keys for reverse motion
---- @param is_pending boolean: whether this motion is in operator pending mode
+--- @param read_char boolean: whether this motion waits for another character
 --- @return table: next and prev functions which can be used in keymaps
-M.key_motion = function(next_key, prev_key, is_pending)
+M.key_motion = function(next_key, prev_key, read_char)
   return {
-    next = utils.remember_key(next_key, prev_key, is_pending, false),
-    prev = utils.remember_key(prev_key, next_key, is_pending, false),
+    next = utils.remember_key(next_key, prev_key, read_char, false),
+    prev = utils.remember_key(prev_key, next_key, read_char, false),
   }
 end
 
@@ -132,7 +131,7 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
   end
 
-  for _, def in ipairs(M.config.pending_key_motions) do
+  for _, def in ipairs(M.config.read_char_motions) do
     local mem = M.key_motion(def.next, def.prev, true)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }

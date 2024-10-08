@@ -23,27 +23,27 @@ end
 --- remember this basic key so it can be repeated
 --- @param forward string: the forward keys
 --- @param backward string: the backwards keys
---- @param is_pending boolean: whether this motion is in operator pending mode
+--- @param read_char boolean: whether this motion waits for another character
 --- @param is_cmd boolean: cmd doesn't need to execute the keys
 --- @return function: the closure to be used in a keymap
-M.remember_key = function(forward, backward, is_pending, is_cmd)
+M.remember_key = function(forward, backward, read_char, is_cmd)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
     -- get surrounding context for the motion
     local count = vim.v.count
     local countstr = count > 0 and count or ""
-    local pending_chars = ""
-    if is_pending then
-      -- this motion has operator pending mode, so get those chars
-      pending_chars = vim.fn.nr2char(vim.fn.getchar())
+    local char = ""
+    if read_char then
+      -- this motion requires another character
+      char = vim.fn.nr2char(vim.fn.getchar())
     end
-    local count_forward = countstr .. forward .. pending_chars
+    local count_forward = countstr .. forward .. char
 
     local motion = state.push_motion({
       name = count_forward,
       forward_keys = count_forward,
-      backward_keys = countstr .. backward .. pending_chars,
+      backward_keys = countstr .. backward .. char,
     })
 
     if not is_cmd then
