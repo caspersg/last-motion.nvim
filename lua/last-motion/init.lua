@@ -170,17 +170,22 @@ M.setup = function(opts)
     vim.keymap.set({ "n", "v", "o" }, "N", M.backward, { desc = "reverse last motion" })
   end
 
-  vim.api.nvim_create_user_command("LastMotionsNotify", function()
+  vim.api.nvim_create_user_command("LastMotionNotify", function()
     vim.notify(M.get_last_motions(), vim.log.levels.INFO, { title = "Last Motions" })
   end, {})
 
-  vim.api.nvim_create_user_command("LastMotionsForward", function(cmd_opts)
+  vim.api.nvim_create_user_command("LastMotionForward", function(cmd_opts)
     M.forward(tonumber(cmd_opts.args))
   end, { nargs = "?", desc = "repeat the specified, or last motion" })
 
-  vim.api.nvim_create_user_command("LastMotionsBackward", function(cmd_opts)
+  vim.api.nvim_create_user_command("LastMotionBackward", function(cmd_opts)
     M.backward(tonumber(cmd_opts.args))
   end, { nargs = "?", desc = "repeat the specified, or last motion in reverse" })
+
+  vim.api.nvim_create_user_command("LastMotionRemove", function(cmd_opts)
+    local offset = tonumber(cmd_opts.args)
+    table.remove(require("last-motion").history(), (offset or 0) + 1)
+  end, { nargs = "?", desc = "remove the specified motion from history at offset" })
 end
 
 return M

@@ -67,7 +67,7 @@ end
 -- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
 vim.keymap.set({"n", "v", "o"}, ",", "]", { remap = true })
 
-vim.keymap.set({"n", "v", "o"}, ",,", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })
+vim.keymap.set("n", "],", "<cmd>LastMotionNotify<CR>", { desc = "show last-motion history" })
 
 -- if you want to directly manipulate history, you can get the 1-indexed underlying array
 -- eg pop the last motion
