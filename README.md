@@ -55,19 +55,19 @@ I also add these keymaps, which assume [ and ] prefixes from the default config
 
 -- I add keymaps for repeating numbered motions from the history, default is 0-9
 for i = 0, 9 do
-  vim.keymap.set({ "n", "v" }, "]" .. i, function()
+  vim.keymap.set({ "n", "v", "o" }, "]" .. i, function()
     lm.forward(i)
   end, { desc = "repeat " .. i })
-  vim.keymap.set({ "n", "v" }, "[" .. i, function()
+  vim.keymap.set({ "n", "v", "o" }, "[" .. i, function()
     lm.backward(i)
   end, { desc = "repeat " .. i })
 end
 
 
 -- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
-vim.keymap.set("n", ",", "]", { remap = true })
+vim.keymap.set({"n", "v", "o"}, ",", "]", { remap = true })
 
-vim.keymap.set("n", ",,", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })
+vim.keymap.set({"n", "v", "o"}, ",,", "<cmd>LastMotionsNotify<CR>", { desc = "last motions" })
 
 -- if you want to directly manipulate history, you can get the 1-indexed underlying array
 -- eg pop the last motion
@@ -222,8 +222,8 @@ require("last-motion").setup({
   func_motions = {},
 })
 -- Add keymaps for at least forward and backward to do anything useful.
-vim.keymap.set({ "n", "v" }, "n", require("last-motion").forward, { desc = "repeat last motion" })
-vim.keymap.set({ "n", "v" }, "N", require("last-motion").backward, { desc = "reverse last motion" })
+vim.keymap.set({"n", "v", "o"}, "n", require("last-motion").forward, { desc = "repeat last motion" })
+vim.keymap.set({"n", "v", "o"}, "N", require("last-motion").backward, { desc = "reverse last motion" })
 
 -- add your own keymaps
 local mem = require("last-motion").func_motion(
@@ -233,8 +233,8 @@ local mem = require("last-motion").func_motion(
   require("todo-comments").jump_next,
   require("todo-comments").jump_prev
 )
-vim.keymap.set({ "n", "v" }, "]T", mem.next, { desc = "[T]odo" })
-vim.keymap.set({ "n", "v" }, "[T", mem.prev, { desc = "[T]odo" })
+vim.keymap.set({"n", "v", "o"}, "]T", mem.next, { desc = "[T]odo" })
+vim.keymap.set({"n", "v", "o"}, "[T", mem.prev, { desc = "[T]odo" })
 ```
 
 

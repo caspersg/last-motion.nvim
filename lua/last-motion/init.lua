@@ -111,8 +111,8 @@ M.setup_square_motions = function(motions)
     -- vim.notify("sq '" .. to.desc .. "' '" .. next_key)
 
     local opts = { desc = to.desc, remap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, next_key, mem.next, opts)
-    vim.keymap.set({ "n", "v" }, prev_key, mem.prev, opts)
+    vim.keymap.set({ "n", "v", "o" }, next_key, mem.next, opts)
+    vim.keymap.set({ "n", "v", "o" }, prev_key, mem.prev, opts)
   end
 end
 
@@ -127,32 +127,32 @@ M.setup = function(opts)
     local mem = M.key_motion(def.next, def.prev, false)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
   end
 
   for _, def in ipairs(M.config.read_char_motions) do
     local mem = M.key_motion(def.next, def.prev, true)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
   end
 
   for _, def in ipairs(M.config.cmd_motions) do
     local mem = M.cmd_motion(def.command, def.next, def.prev)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v" }, def.prev, mem.prev, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
+    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
   end
 
   for _, def in ipairs(M.config.func_motions) do
     local mem = M.func_motion(def.next, def.prev, def.next_func, def.prev_func)
 
     local desc = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v" }, def.next, mem.next, desc)
-    vim.keymap.set({ "n", "v" }, def.prev, mem.prev, desc)
+    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, desc)
+    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, desc)
   end
 
   local sm = require("square-motions")
@@ -166,8 +166,8 @@ M.setup = function(opts)
 
   if M.config.default_next_previous_keys then
     -- Add keymaps for at least forward and backward to do anything useful.
-    vim.keymap.set({ "n", "v" }, "n", M.forward, { desc = "repeat last motion" })
-    vim.keymap.set({ "n", "v" }, "N", M.backward, { desc = "reverse last motion" })
+    vim.keymap.set({ "n", "v", "o" }, "n", M.forward, { desc = "repeat last motion" })
+    vim.keymap.set({ "n", "v", "o" }, "N", M.backward, { desc = "reverse last motion" })
   end
 
   vim.api.nvim_create_user_command("LastMotionsNotify", function()
