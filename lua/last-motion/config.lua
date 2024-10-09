@@ -18,15 +18,15 @@ return {
   --- with just next and prev, those keys should behave as normal
   --- as they will be replaced with new keymaps, that just call those keys and remember the motion
   key_motions = {
-    { next = "w", prev = "b" },
-    { next = "W", prev = "B" },
-    { next = "}", prev = "{" },
-    { next = ")", prev = "(" },
-    { next = "e", prev = "ge" },
-    { next = "E", prev = "gE" },
-    { next = "h", prev = "l" },
-    { next = "j", prev = "k" },
-    { next = "]m", prev = "[m", desc = "[m]ethod" },
+    { next = "w", prev = "b", count = true },
+    { next = "W", prev = "B", count = true },
+    { next = "}", prev = "{", count = true },
+    { next = ")", prev = "(", count = true },
+    { next = "e", prev = "ge", count = true },
+    { next = "E", prev = "gE", count = true },
+    { next = "h", prev = "l", count = true },
+    { next = "j", prev = "k", count = true },
+    { next = "]m", prev = "[m", desc = "[m]ethod", count = true },
 
     -- next and prev can process control keys too
     { next = "<C-d>", prev = "<C-u>" },
@@ -42,8 +42,9 @@ return {
   read_char_motions = {
     -- it will wait until the following key is entered
     -- maybe it's only a special case for fFtT ?
-    { next = "f", prev = "F" },
-    { next = "t", prev = "T" },
+    -- TODO: fix off by one error
+    { next = "f", prev = "F", count = true },
+    { next = "t", prev = "T", count = true },
   },
 
   --- motions that trigger CmdLineLeave events, pretty much just search

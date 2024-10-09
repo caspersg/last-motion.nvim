@@ -25,14 +25,15 @@ end
 --- @param backward string: the backwards keys
 --- @param read_char boolean: whether this motion waits for another character
 --- @param is_cmd boolean: cmd doesn't need to execute the keys
+--- @param has_count boolean: if motion already supports counts
 --- @return function: the closure to be used in a keymap
-M.remember_key = function(forward, backward, read_char, is_cmd)
+M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
     -- get surrounding context for the motion
     local count = vim.v.count
-    local countstr = count > 0 and count or ""
+    local countstr = not has_count and count > 0 and count or ""
     local char = ""
     if read_char then
       -- this motion requires another character

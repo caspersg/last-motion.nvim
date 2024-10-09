@@ -26,11 +26,12 @@ end
 --- @param next_key string: keys for motion
 --- @param prev_key string: keys for reverse motion
 --- @param read_char boolean: whether this motion waits for another character
+--- @param has_count boolean: if motion already supports counts
 --- @return table: next and prev functions which can be used in keymaps
-M.key_motion = function(next_key, prev_key, read_char)
+M.key_motion = function(next_key, prev_key, read_char, has_count)
   return {
-    next = utils.remember_key(next_key, prev_key, read_char, false),
-    prev = utils.remember_key(prev_key, next_key, read_char, false),
+    next = utils.remember_key(next_key, prev_key, read_char, false, has_count),
+    prev = utils.remember_key(prev_key, next_key, read_char, false, has_count),
   }
 end
 
@@ -38,10 +39,11 @@ end
 --- @param command string: the command to register
 --- @param next string: the next keymap to use
 --- @param prev string: the previous keymap to use
+--- @param has_count boolean: if motion already supports counts
 --- @return table: next and prev functions which can be used in keymaps
-M.cmd_motion = function(command, next, prev)
-  local mem_next = utils.remember_key(next, prev, false, true)
-  local mem_prev = utils.remember_key(prev, next, false, true)
+M.cmd_motion = function(command, next, prev, has_count)
+  local mem_next = utils.remember_key(next, prev, false, true, has_count)
+  local mem_prev = utils.remember_key(prev, next, false, true, has_count)
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
@@ -124,7 +126,7 @@ M.setup = function(opts)
   state.max_motions = M.config.max_motions
 
   for _, def in ipairs(M.config.key_motions) do
-    local mem = M.key_motion(def.next, def.prev, false)
+    local mem = M.key_motion(def.next, def.prev, false, def.count)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
     vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
@@ -132,7 +134,7 @@ M.setup = function(opts)
   end
 
   for _, def in ipairs(M.config.read_char_motions) do
-    local mem = M.key_motion(def.next, def.prev, true)
+    local mem = M.key_motion(def.next, def.prev, true, def.count)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
     vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
@@ -140,7 +142,7 @@ M.setup = function(opts)
   end
 
   for _, def in ipairs(M.config.cmd_motions) do
-    local mem = M.cmd_motion(def.command, def.next, def.prev)
+    local mem = M.cmd_motion(def.command, def.next, def.prev, def.count)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
     vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
