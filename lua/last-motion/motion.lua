@@ -31,6 +31,7 @@ end
 local function exec_keys(cmd_str)
   -- it's a raw set of keys to execute
   local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
+  -- TODO: ! won't work with other keymaps
   vim.cmd("normal! " .. cmd)
 end
 
