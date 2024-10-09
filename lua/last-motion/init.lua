@@ -30,8 +30,8 @@ end
 --- @return table: next and prev functions which can be used in keymaps
 M.key_motion = function(next_key, prev_key, read_char, has_count)
   return {
-    next = utils.remember_key(next_key, prev_key, read_char, false, has_count),
-    prev = utils.remember_key(prev_key, next_key, read_char, false, has_count),
+    next = utils.remember_key(next_key, prev_key, false, has_count),
+    prev = utils.remember_key(prev_key, next_key, false, has_count),
   }
 end
 
@@ -42,8 +42,8 @@ end
 --- @param has_count boolean: if motion already supports counts
 --- @return table: next and prev functions which can be used in keymaps
 M.cmd_motion = function(command, next, prev, has_count)
-  local mem_next = utils.remember_key(next, prev, false, true, has_count)
-  local mem_prev = utils.remember_key(prev, next, false, true, has_count)
+  local mem_next = utils.remember_key(next, prev, true, has_count)
+  local mem_prev = utils.remember_key(prev, next, true, has_count)
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
@@ -127,14 +127,6 @@ M.setup = function(opts)
 
   for _, def in ipairs(M.config.key_motions) do
     local mem = M.key_motion(def.next, def.prev, false, def.count)
-
-    local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
-  end
-
-  for _, def in ipairs(M.config.read_char_motions) do
-    local mem = M.key_motion(def.next, def.prev, true, def.count)
 
     local noremap = { desc = def.desc, noremap = true, silent = true }
     vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)

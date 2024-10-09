@@ -38,15 +38,6 @@ return {
     { next = "G", prev = "gg" },
   },
 
-  --- motions that wait for another char
-  read_char_motions = {
-    -- it will wait until the following key is entered
-    -- maybe it's only a special case for fFtT ?
-    -- TODO: fix off by one error
-    { next = "f", prev = "F", count = true },
-    { next = "t", prev = "T", count = true },
-  },
-
   --- motions that trigger CmdLineLeave events, pretty much just search
   cmd_motions = {
     -- search has a few special cases
@@ -60,6 +51,37 @@ return {
   --- next/prev are just used as the name of the motion for history
   --- new keymaps are assumed to use [ and ] prefixes, inspired by vim-unimpaired
   func_motions = {
+
+    -- it will wait until the following key is entered
+    -- maybe it's only a special case for fFtT ?
+    -- For some reason "v" is required, otherwise operator pending mode doesn't work properly
+    -- eg "dfc" on "local" gives "cal"
+    {
+      next = "f",
+      prev = "F",
+      count = true,
+      next_func = function()
+        local char = vim.fn.nr2char(vim.fn.getchar())
+        vim.cmd("normal! v" .. "f" .. char)
+      end,
+      prev_func = function()
+        local char = vim.fn.nr2char(vim.fn.getchar())
+        vim.cmd("normal! v" .. "F" .. char)
+      end,
+    },
+    {
+      next = "t",
+      prev = "T",
+      count = true,
+      next_func = function()
+        local char = vim.fn.nr2char(vim.fn.getchar())
+        vim.cmd("normal! v" .. "t" .. char)
+      end,
+      prev_func = function()
+        local char = vim.fn.nr2char(vim.fn.getchar())
+        vim.cmd("normal! v" .. "T" .. char)
+      end,
+    },
     {
       next = "<C-i>",
       prev = "<C-o>",
