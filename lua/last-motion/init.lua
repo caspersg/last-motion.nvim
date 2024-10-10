@@ -101,14 +101,16 @@ M.get_last_motions = function()
 end
 
 local function create_keymaps(def, mem)
-  local modes = { "n", "v" }
-  if not def.operator_pending then
-    table.insert(modes, "o")
-  end
+  local opts = { desc = def.desc, remap = true, silent = true }
 
-  local noremap = { desc = def.desc, noremap = true, silent = true }
-  vim.keymap.set(modes, def.next, mem.next, noremap)
-  vim.keymap.set(modes, def.prev, mem.prev, noremap)
+  local modes = { "n", "v" }
+  vim.keymap.set(modes, def.next, mem.next, opts)
+  vim.keymap.set(modes, def.prev, mem.prev, opts)
+  if not def.operator_pending then
+    -- add operator pending for motions that don't support it, but don't remember them as motions
+    vim.keymap.set("o", def.next, def.next_func or def.next, opts)
+    vim.keymap.set("o", def.prev, def.prev_func or def.next, opts)
+  end
 end
 
 M.setup_square_motions = function(motions)
@@ -123,7 +125,14 @@ M.setup_square_motions = function(motions)
 
     -- vim.notify("sq '" .. to.desc .. "' '" .. next_key)
 
-    create_keymaps({ next = next_key, prev = prev_key, desc = to.desc, operator_pending = false }, mem)
+    create_keymaps({
+      next = next_key,
+      prev = prev_key,
+      next_func = to.next,
+      prev_func = to.prev,
+      desc = to.desc,
+      operator_pending = false,
+    }, mem)
   end
 end
 

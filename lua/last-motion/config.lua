@@ -29,8 +29,8 @@ return {
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
     -- next and prev can process control keys too
-    { next = "<C-d>", prev = "<C-u>" },
-    { next = "<C-f>", prev = "<C-b>" },
+    { next = "<C-d>", prev = "<C-u>", desc = "half scroll" },
+    { next = "<C-f>", prev = "<C-b>", desc = "scroll" },
 
     -- these ones only go back and forth between two positions, so pretty pointless
     { next = "g_", prev = "^", operator_pending = true },
@@ -63,6 +63,7 @@ return {
     {
       next = "<C-i>",
       prev = "<C-o>",
+      desc = "jumps",
       next_func = function()
         -- C-i is a special case, it's the same as tab, so it requires feedkeys
         -- TODO: But this doesn't work in operator pending mode
