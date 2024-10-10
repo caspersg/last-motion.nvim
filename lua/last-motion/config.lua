@@ -18,24 +18,24 @@ return {
   --- with just next and prev, those keys should behave as normal
   --- as they will be replaced with new keymaps, that just call those keys and remember the motion
   key_motions = {
-    { next = "w", prev = "b" },
-    { next = "W", prev = "B" },
-    { next = "}", prev = "{" },
-    { next = ")", prev = "(" },
-    { next = "e", prev = "ge" },
-    { next = "E", prev = "gE" },
-    { next = "h", prev = "l" },
-    { next = "j", prev = "k" },
-    { next = "]m", prev = "[m", desc = "[m]ethod" },
+    { next = "w", prev = "b", operator_pending = true },
+    { next = "W", prev = "B", operator_pending = true },
+    { next = "}", prev = "{", operator_pending = true },
+    { next = ")", prev = "(", operator_pending = true },
+    { next = "e", prev = "ge", operator_pending = true },
+    { next = "E", prev = "gE", operator_pending = true },
+    { next = "h", prev = "l", operator_pending = true },
+    { next = "j", prev = "k", operator_pending = true },
+    { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
     -- next and prev can process control keys too
     { next = "<C-d>", prev = "<C-u>" },
     { next = "<C-f>", prev = "<C-b>" },
 
     -- these ones only go back and forth between two positions, so pretty pointless
-    { next = "g_", prev = "^" },
-    { next = "$", prev = "0" },
-    { next = "G", prev = "gg" },
+    { next = "g_", prev = "^", operator_pending = true },
+    { next = "$", prev = "0", operator_pending = true },
+    { next = "G", prev = "gg", operator_pending = true },
   },
 
   --- motions that wait for another char
@@ -51,8 +51,8 @@ return {
   cmd_motions = {
     -- search has a few special cases
     -- uses command for keys that are a special case that don't need to create new keymaps
-    { command = "/", next = "n", prev = "N" },
-    { command = "?", next = "n", prev = "N" },
+    { command = "/", next = "n", prev = "N", operator_pending = true },
+    { command = "?", next = "n", prev = "N", operator_pending = true },
   },
 
   --- motions that are called with functions
@@ -81,6 +81,7 @@ return {
       prev = "#",
       next_func = search.next_search,
       prev_func = search.prev_search,
+      operator_pending = true,
     },
     {
       -- adds key to get back to recent search results after other movements
