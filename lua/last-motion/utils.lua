@@ -33,6 +33,7 @@ M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
 
     -- get surrounding context for the motion
     local count = vim.v.count
+    -- TODO: remove has_count if nothing needs it
     local countstr = not has_count and count > 0 and count or ""
     local char = ""
     if read_char then
