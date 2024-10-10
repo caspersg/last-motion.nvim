@@ -106,7 +106,7 @@ local function create_keymaps(def, mem)
   local modes = { "n", "v" }
   vim.keymap.set(modes, def.next, mem.next, opts)
   vim.keymap.set(modes, def.prev, mem.prev, opts)
-  if not def.operator_pending then
+  if M.config.add_operator_pending_keymaps and not def.operator_pending then
     -- add operator pending for motions that don't support it, but don't remember them as motions
     vim.keymap.set("o", def.next, def.next_func or def.next, opts)
     vim.keymap.set("o", def.prev, def.prev_func or def.next, opts)

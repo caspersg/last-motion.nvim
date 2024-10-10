@@ -9,6 +9,8 @@ return {
   square_motions = true,
   -- if true, imports textobject keymaps from caspersg/square-motions.nvim
   textobjects = true,
+  -- if true, adds operator pending keymaps, unless operator_pending = true
+  add_operator_pending_keymaps = true,
 
   -- Ideally this would have every pair of motions
   -- it doesn't matter which key in a pair is next or prev, as direction is preserved
