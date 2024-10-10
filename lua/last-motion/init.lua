@@ -100,6 +100,17 @@ M.get_last_motions = function()
   return table.concat(lines, "\n")
 end
 
+local function create_keymaps(def, mem)
+  local modes = { "n", "v" }
+  if not def.operator_pending then
+    table.insert(modes, "o")
+  end
+
+  local noremap = { desc = def.desc, noremap = true, silent = true }
+  vim.keymap.set(modes, def.next, mem.next, noremap)
+  vim.keymap.set(modes, def.prev, mem.prev, noremap)
+end
+
 M.setup_square_motions = function(motions)
   local sm = require("square-motions")
 
@@ -112,9 +123,7 @@ M.setup_square_motions = function(motions)
 
     -- vim.notify("sq '" .. to.desc .. "' '" .. next_key)
 
-    local opts = { desc = to.desc, remap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, next_key, mem.next, opts)
-    vim.keymap.set({ "n", "v", "o" }, prev_key, mem.prev, opts)
+    create_keymaps({ next = next_key, prev = prev_key, desc = to.desc, operator_pending = false }, mem)
   end
 end
 
@@ -127,34 +136,22 @@ M.setup = function(opts)
 
   for _, def in ipairs(M.config.key_motions) do
     local mem = M.key_motion(def.next, def.prev, false, def.count)
-
-    local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
+    create_keymaps(def, mem)
   end
 
   for _, def in ipairs(M.config.read_char_motions) do
     local mem = M.key_motion(def.next, def.prev, true, def.count)
-
-    local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
+    create_keymaps(def, mem)
   end
 
   for _, def in ipairs(M.config.cmd_motions) do
     local mem = M.cmd_motion(def.command, def.next, def.prev, def.count)
-
-    local noremap = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, noremap)
-    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, noremap)
+    create_keymaps(def, mem)
   end
 
   for _, def in ipairs(M.config.func_motions) do
     local mem = M.func_motion(def.next, def.prev, def.next_func, def.prev_func)
-
-    local desc = { desc = def.desc, noremap = true, silent = true }
-    vim.keymap.set({ "n", "v", "o" }, def.next, mem.next, desc)
-    vim.keymap.set({ "n", "v", "o" }, def.prev, mem.prev, desc)
+    create_keymaps(def, mem)
   end
 
   local sm = require("square-motions")

@@ -43,8 +43,8 @@ return {
     -- it will wait until the following key is entered
     -- maybe it's only a special case for fFtT ?
     -- TODO: fix off by one error
-    { next = "f", prev = "F", count = true },
-    { next = "t", prev = "T", count = true },
+    { next = "f", prev = "F", count = true, operator_pending = true },
+    { next = "t", prev = "T", count = true, operator_pending = true },
   },
 
   --- motions that trigger CmdLineLeave events, pretty much just search
