@@ -65,6 +65,7 @@ return {
       prev = "<C-o>",
       next_func = function()
         -- C-i is a special case, it's the same as tab, so it requires feedkeys
+        -- TODO: But this doesn't work in operator pending mode
         local cmd = vim.api.nvim_replace_termcodes("<C-i>", true, true, true)
         vim.api.nvim_feedkeys(cmd, "n", true)
       end,
