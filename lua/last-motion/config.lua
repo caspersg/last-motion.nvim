@@ -63,21 +63,6 @@ return {
   --- new keymaps are assumed to use [ and ] prefixes, inspired by vim-unimpaired
   func_motions = {
     {
-      next = "<C-i>",
-      prev = "<C-o>",
-      desc = "jumps",
-      next_func = function()
-        -- C-i is a special case, it's the same as tab, so it requires feedkeys
-        -- TODO: But this doesn't work in operator pending mode
-        local cmd = vim.api.nvim_replace_termcodes("<C-i>", true, true, true)
-        vim.api.nvim_feedkeys(cmd, "n", true)
-      end,
-      prev_func = function()
-        local cmd = vim.api.nvim_replace_termcodes("<C-o>", true, true, true)
-        vim.cmd("normal! " .. cmd)
-      end,
-    },
-    {
       -- search has existing keys, but need to use a new implementation function to deal with starting a new search vs continuing a search
       -- local search = require("last-motion.search") -- import is required
       next = "*",
