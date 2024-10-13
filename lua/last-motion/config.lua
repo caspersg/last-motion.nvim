@@ -26,8 +26,11 @@ return {
     { next = ")", prev = "(", operator_pending = true },
     { next = "e", prev = "ge", operator_pending = true },
     { next = "E", prev = "gE", operator_pending = true },
+
+    -- do you really want to remember single character movements? Could be useful with counts
     { next = "h", prev = "l", operator_pending = true },
     { next = "j", prev = "k", operator_pending = true },
+
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
     -- next and prev can process control keys too
@@ -44,7 +47,6 @@ return {
   read_char_motions = {
     -- it will wait until the following key is entered
     -- maybe it's only a special case for fFtT ?
-    -- TODO: fix off by one error
     { next = "f", prev = "F", operator_pending = true },
     { next = "t", prev = "T", operator_pending = true },
   },

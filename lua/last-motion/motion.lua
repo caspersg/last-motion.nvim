@@ -31,7 +31,8 @@ end
 local function exec_keys(cmd_str)
   -- it's a raw set of keys to execute
   local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-  -- TODO: ! won't work with other keymaps
+  -- '!' won't work with other keymaps, but it's required to avoid recursive calls
+  -- So we can only use keys with builtin motions
   vim.cmd("normal! " .. cmd)
 end
 
