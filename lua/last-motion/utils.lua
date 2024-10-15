@@ -1,6 +1,7 @@
 local M = {}
 
 local state = require("last-motion.state")
+local exec = require("last-motion.exec")
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()
@@ -33,8 +34,8 @@ M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
 
     -- get surrounding context for the motion
     local count = vim.v.count
-    -- TODO: remove has_count if nothing needs it
-    local countstr = not has_count and count > 0 and count or ""
+    -- always remember the count
+    local countstr = count > 0 and count or ""
     local char = ""
     if read_char then
       -- this motion requires another character
@@ -49,7 +50,8 @@ M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
     })
 
     if not is_cmd then
-      motion:forward()
+      -- motion:forward() multiplies the count for some reason
+      exec.exec_keys(count_forward)
     end
   end
 end
