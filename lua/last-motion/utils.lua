@@ -1,19 +1,7 @@
 local M = {}
 
 local state = require("last-motion.state")
-local ts_move = require("nvim-treesitter.textobjects.move")
-
-M.ts_next = function(query)
-  return function()
-    ts_move.goto_next_start(query)
-  end
-end
-
-M.ts_prev = function(query)
-  return function()
-    ts_move.goto_previous_start(query)
-  end
-end
+local exec = require("last-motion.exec")
 
 --- debug helper to show what the last motion was
 M.notify_last_motion = function()
@@ -36,31 +24,34 @@ end
 --- remember this basic key so it can be repeated
 --- @param forward string: the forward keys
 --- @param backward string: the backwards keys
---- @param is_pending boolean: whether this motion is in operator pending mode
+--- @param read_char boolean: whether this motion waits for another character
 --- @param is_cmd boolean: cmd doesn't need to execute the keys
+--- @param has_count boolean: if motion already supports counts
 --- @return function: the closure to be used in a keymap
-M.remember_key = function(forward, backward, is_pending, is_cmd)
+M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
     -- get surrounding context for the motion
     local count = vim.v.count
+    -- always remember the count
     local countstr = count > 0 and count or ""
-    local pending_chars = ""
-    if is_pending then
-      -- this motion has operator pending mode, so get those chars
-      pending_chars = vim.fn.nr2char(vim.fn.getchar())
+    local char = ""
+    if read_char then
+      -- this motion requires another character
+      char = vim.fn.nr2char(vim.fn.getchar())
     end
-    local count_forward = countstr .. forward .. pending_chars
+    local count_forward = countstr .. forward .. char
 
     local motion = state.push_motion({
       name = count_forward,
       forward_keys = count_forward,
-      backward_keys = countstr .. backward .. pending_chars,
+      backward_keys = countstr .. backward .. char,
     })
 
     if not is_cmd then
-      motion:forward()
+      -- motion:forward() multiplies the count for some reason
+      exec.exec_keys(count_forward)
     end
   end
 end

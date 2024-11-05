@@ -8,6 +8,8 @@
 local Motion = {}
 Motion.__index = Motion
 
+local exec = require("last-motion.exec")
+
 --- create a new motion
 function Motion.new(opts)
   local new = setmetatable({}, Motion)
@@ -26,26 +28,13 @@ function Motion:display()
   return self.name
 end
 
---- execute a basic key sequence
---- @param cmd_str string: the exact keys for the motion
-local function exec_keys(cmd_str)
-  -- it's a raw set of keys to execute
-  local cmd = vim.api.nvim_replace_termcodes(cmd_str, true, true, true)
-  if string.find(cmd_str, "<C%-i>") then
-    -- C-i is a special case, it's the same as tab, so it requires feedkeys
-    vim.api.nvim_feedkeys(cmd, "n", true)
-  else
-    vim.cmd("normal! " .. cmd)
-  end
-end
-
 function Motion:repeat_motion(direction)
   -- count specific to the repeat, so multiplies with the original count
   local count = vim.v.count
   for _ = 1, math.max(count, 1) do
     local keys = self[direction .. "_keys"]
     if keys then
-      exec_keys(keys)
+      exec.exec_keys(keys)
     else
       self[direction .. "_func"]()
     end
