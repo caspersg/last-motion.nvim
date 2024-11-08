@@ -33,6 +33,8 @@ return {
 
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
+    { next = "g,", prev = "g;", operator_pending = true },
+
     -- next and prev can process control keys too
     { next = "<C-d>", prev = "<C-u>", desc = "half scroll" },
     { next = "<C-f>", prev = "<C-b>", desc = "scroll" },
