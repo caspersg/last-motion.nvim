@@ -28,8 +28,8 @@ return {
     { next = "E", prev = "gE", operator_pending = true },
 
     -- do you really want to remember single character movements? Could be useful with counts
-    { next = "h", prev = "l", operator_pending = true },
-    { next = "j", prev = "k", operator_pending = true },
+    -- { next = "h", prev = "l", operator_pending = true },
+    -- { next = "j", prev = "k", operator_pending = true },
 
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
