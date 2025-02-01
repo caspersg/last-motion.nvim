@@ -20,12 +20,12 @@ return {
   --- with just next and prev, those keys should behave as normal
   --- as they will be replaced with new keymaps, that just call those keys and remember the motion
   key_motions = {
-    { next = "w", prev = "b", operator_pending = true },
-    { next = "W", prev = "B", operator_pending = true },
+    -- { next = "w", prev = "b", operator_pending = true },
+    -- { next = "W", prev = "B", operator_pending = true },
     { next = "}", prev = "{", operator_pending = true },
     { next = ")", prev = "(", operator_pending = true },
-    { next = "e", prev = "ge", operator_pending = true },
-    { next = "E", prev = "gE", operator_pending = true },
+    -- { next = "e", prev = "ge", operator_pending = true },
+    -- { next = "E", prev = "gE", operator_pending = true },
 
     -- do you really want to remember single character movements? Could be useful with counts
     -- { next = "h", prev = "l", operator_pending = true },
@@ -40,9 +40,9 @@ return {
     { next = "<C-f>", prev = "<C-b>", desc = "scroll" },
 
     -- these ones only go back and forth between two positions, so pretty pointless
-    { next = "g_", prev = "^", operator_pending = true },
-    { next = "$", prev = "0", operator_pending = true },
-    { next = "G", prev = "gg", operator_pending = true },
+    -- { next = "g_", prev = "^", operator_pending = true },
+    -- { next = "$", prev = "0", operator_pending = true },
+    -- { next = "G", prev = "gg", operator_pending = true },
   },
 
   --- motions that wait for another char
