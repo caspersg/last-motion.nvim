@@ -20,16 +20,22 @@ return {
   --- with just next and prev, those keys should behave as normal
   --- as they will be replaced with new keymaps, that just call those keys and remember the motion
   key_motions = {
+    -- not very useful
     -- { next = "w", prev = "b", operator_pending = true },
     -- { next = "W", prev = "B", operator_pending = true },
-    { next = "}", prev = "{", operator_pending = true },
-    { next = ")", prev = "(", operator_pending = true },
     -- { next = "e", prev = "ge", operator_pending = true },
     -- { next = "E", prev = "gE", operator_pending = true },
-
     -- do you really want to remember single character movements? Could be useful with counts
     -- { next = "h", prev = "l", operator_pending = true },
     -- { next = "j", prev = "k", operator_pending = true },
+
+    { next = "}", prev = "{", operator_pending = true },
+    { next = ")", prev = "(", operator_pending = true },
+
+    -- new default keymaps from neovim 0.11
+    { next = "]b", prev = "[b", desc = "[b]uffer", operator_pending = true },
+    { next = "]q", prev = "[q", desc = "[q]uickfix", operator_pending = true },
+    -- other new default keymaps are overridden by square-motions.nvim
 
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
