@@ -32,11 +32,6 @@ return {
     { next = "}", prev = "{", operator_pending = true },
     { next = ")", prev = "(", operator_pending = true },
 
-    -- new default keymaps from neovim 0.11
-    { next = "]b", prev = "[b", desc = "[b]uffer", operator_pending = true },
-    { next = "]q", prev = "[q", desc = "[q]uickfix", operator_pending = true },
-    -- other new default keymaps are overridden by square-motions.nvim
-
     { next = "]m", prev = "[m", desc = "[m]ethod", operator_pending = true },
 
     { next = "g,", prev = "g;", operator_pending = true },
