@@ -33,8 +33,11 @@ TODO add  a video
 {
   "caspersg/last-motion.nvim",
   dependencies = {
+    -- if using the treesitter motions
     { "nvim-treesitter/nvim-treesitter" },
     { "nvim-treesitter/nvim-treesitter-textobjects" },
+
+    -- if using the square-motions keymaps
     { "caspersg/square-motions.nvim" },
   },
   config = function()
@@ -45,33 +48,6 @@ TODO add  a video
   end
 }
 
-```
-
-### Recommended keymaps
-
-I also add these keymaps, which assume [ and ] prefixes from the default config
-
-```lua
-
--- I add keymaps for repeating numbered motions from the history, default is 0-9
-for i = 0, 9 do
-  vim.keymap.set({ "n", "v", "o" }, "]" .. i, function()
-    lm.forward(i)
-  end, { desc = "repeat " .. i })
-  vim.keymap.set({ "n", "v", "o" }, "[" .. i, function()
-    lm.backward(i)
-  end, { desc = "repeat " .. i })
-end
-
-
--- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
-vim.keymap.set({"n", "v", "o"}, ",", "]", { remap = true })
-
-vim.keymap.set("n", "],", "<cmd>LastMotionNotify<CR>", { desc = "show last-motion history" })
-
--- if you want to directly manipulate history, you can get the 1-indexed underlying array
--- eg pop the last motion
-table.remove(require("last-motion").history(), 1)
 ```
 
 ## Usage
@@ -102,6 +78,12 @@ repeat motion at offset 0-indexed `:LastMotionsForward 4`
 reverse motion at offset 0-indexed `:LastMotionsBackward 4`
 
 
+If you want to directly manipulate history, you can get the 1-indexed underlying array
+eg pop the last motion
+
+```lua
+table.remove(require("last-motion").history(), 1)
+```
 
 ## Default Configuration
 
@@ -111,42 +93,72 @@ Some of the definitions need to import helper functions.
 [Default Config](https://github.com/caspersg/last-motion.nvim/blob/main/lua/last-motion/config.lua)
 
 
+### Recommended keymaps
+
+I also add these keymaps, which assume [ and ] prefixes from the default config
+
+```lua
+
+-- I add keymaps for repeating numbered motions from the history, default is 0-9
+for i = 0, 9 do
+  vim.keymap.set({ "n", "v", "o" }, "]" .. i, function()
+    lm.forward(i)
+  end, { desc = "repeat " .. i })
+  vim.keymap.set({ "n", "v", "o" }, "[" .. i, function()
+    lm.backward(i)
+  end, { desc = "repeat " .. i })
+end
+
+
+-- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
+vim.keymap.set({"n", "v", "o"}, ",", "]", { remap = true })
+
+vim.keymap.set("n", "],", "<cmd>LastMotionNotify<CR>", { desc = "show last-motion history" })
+```
+
 ## Manual Configuration
 
 If you don't want to use any of the default configurations or keymaps, you can register each motion manually.
 
 ```lua
-require("last-motion").setup({
-  max_motions = 10,
-  default_next_previous_keys = false,
-  square_motions = false,
-  textobjects = false,
-  add_operator_pending_keymaps = false,
-  key_motions = {},
-  read_char_motions  = {},
-  cmd_motions = {},
-  func_motions = {},
-})
--- Add keymaps for at least forward and backward to do anything useful.
-vim.keymap.set({"n", "v", "o"}, "n", require("last-motion").forward, { desc = "repeat last motion" })
-vim.keymap.set({"n", "v", "o"}, "N", require("last-motion").backward, { desc = "reverse last motion" })
+{
+  "caspersg/last-motion.nvim",
+  dependencies = {},
+  config = function()
+    local lm = require("last-motion")
+    lm.setup({
+      max_motions = 10,
+      default_next_previous_keys = false,
+      square_motions = false,
+      textobjects = false,
+      add_operator_pending_keymaps = false,
+      key_motions = {},
+      read_char_motions = {},
+      cmd_motions = {},
+      func_motions = {},
+    })
 
--- add your own keymaps
-local mem = require("last-motion").func_motion(
-  -- it needs names for next/prev to be shown in the history
-  "]T",
-  "[T",
-  require("todo-comments").jump_next,
-  require("todo-comments").jump_prev
-)
-vim.keymap.set({"n", "v", "o"}, "]T", mem.next, { desc = "[T]odo" })
-vim.keymap.set({"n", "v", "o"}, "[T", mem.prev, { desc = "[T]odo" })
+    -- Add keymaps for at least forward and backward to do anything useful.
+    vim.keymap.set({ "n", "v", "o" }, "n", lm.forward, { desc = "repeat last motion" })
+    vim.keymap.set({ "n", "v", "o" }, "N", lm.backward, { desc = "reverse last motion" })
+
+    -- add your own keymaps
+    local mem = lm.func_motion(
+      -- it needs names for next/prev to be shown in the history
+      "]d",
+      "[d",
+      function()
+        vim.diagnostic.jump({ count = 1, float = true })
+      end,
+      function()
+        vim.diagnostic.jump({ count = -1, float = true })
+      end
+    )
+    vim.keymap.set({ "n", "v", "o" }, "]d", mem.next, { desc = "[d]iagnostic" })
+    vim.keymap.set({ "n", "v", "o" }, "[d", mem.prev, { desc = "[d]iagnostic" })
+  end,
+}
 ```
-
-
-## TODO
-
-
 
 ## Similar plugins
 
