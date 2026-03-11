@@ -1,8 +1,6 @@
 local search = require("last-motion.search")
 
 return {
-  -- how many motions to remember
-  max_motions = 10,
   -- use n and N for next and previous
   default_next_previous_keys = true,
   -- if true, imports keymaps from caspersg/square-motions.nvim
@@ -64,7 +62,6 @@ return {
 
   --- motions that are called with functions
   --- desc is only to work with which-key
-  --- next/prev are just used as the name of the motion for history
   --- new keymaps are assumed to use [ and ] prefixes, inspired by vim-unimpaired
   func_motions = {
     {

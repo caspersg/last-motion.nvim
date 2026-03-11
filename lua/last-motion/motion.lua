@@ -1,5 +1,4 @@
 --- @class Motion an individual motion, either set func or keys
---- @field name string: the exact keys, or a description of the motion
 --- @field forward_func? function: to repeat motion
 --- @field backward_func? function: to repeat motion in reverse
 --- @field forward_keys? string: keys to repeat motion
@@ -14,7 +13,6 @@ local exec = require("last-motion.exec")
 function Motion.new(opts)
   local new = setmetatable({}, Motion)
 
-  new.name = opts.name
   new.searching = false
   new.forward_func = opts.forward_func
   new.backward_func = opts.backward_func
@@ -22,10 +20,6 @@ function Motion.new(opts)
   new.backward_keys = opts.backward_keys
 
   return new
-end
-
-function Motion:display()
-  return self.name
 end
 
 function Motion:repeat_motion(direction)
