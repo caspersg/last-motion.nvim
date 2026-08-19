@@ -44,7 +44,6 @@ M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
     local count_forward = countstr .. forward .. char
 
     local motion = state.push_motion({
-      name = count_forward,
       forward_keys = count_forward,
       backward_keys = countstr .. backward .. char,
     })
@@ -57,21 +56,18 @@ M.remember_key = function(forward, backward, read_char, is_cmd, has_count)
 end
 
 --- remember this motion so it can be repeated
---- @param key string: the key that triggered the motion
 --- @param forward function: the function to execute the motion
 --- @param backward function: the function to execute the motion in reverse
 --- @return function: the closure to be used in a keymap
-M.remember_func = function(key, forward, backward)
+M.remember_func = function(forward, backward)
   return function()
     -- this is inline with all motions, so do as little as possible here
 
     -- get surrounding context for the motion
     local count = vim.v.count
-    local countstr = count > 0 and count or ""
     local count_forward = M.with_count(forward, count)
 
     state.push_motion({
-      name = countstr .. key,
       forward_func = count_forward,
       backward_func = M.with_count(backward, count),
     })

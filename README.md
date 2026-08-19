@@ -6,11 +6,9 @@ Like . (dot) repeat, but for motions.
 So you can:
 - repeat the last motion
 - reverse the last motion
-- view motion history
-- repeat numbered motion from history
 - add a count prefix to a repeat
 
-Motion keymaps are replaced with next/prev pairs of keymaps that remember a history of previous motions.
+Motion keymaps are replaced with next/prev pairs of keymaps that remember the previous motion.
 It remembers direction, so for example 'n' after '?' will continue search upwards through the document.
 
 Some uses:
@@ -56,34 +54,16 @@ This assumes the recommended keymaps.
 
 Move around with a motion eg `2}`
 
-view motion history `,,`
-
 repeat the last motion `n`
 
 reverse the last motion `N`
 
-repeat numbered motion from history `]5`
-
 add a count prefix to a repeat `3n`
 
 ### Ex commands
-vim.notify the motion history `:LastMotionsNotify`
-
 repeat last motion `:LastMotionsForward`
 
 reverse last motion `:LastMotionsBackward`
-
-repeat motion at offset 0-indexed `:LastMotionsForward 4`
-
-reverse motion at offset 0-indexed `:LastMotionsBackward 4`
-
-
-If you want to directly manipulate history, you can get the 1-indexed underlying array
-eg pop the last motion
-
-```lua
-table.remove(require("last-motion").history(), 1)
-```
 
 ## Default Configuration
 
@@ -98,22 +78,8 @@ Some of the definitions need to import helper functions.
 I also add these keymaps, which assume [ and ] prefixes from the default config
 
 ```lua
-
--- I add keymaps for repeating numbered motions from the history, default is 0-9
-for i = 0, 9 do
-  vim.keymap.set({ "n", "v", "o" }, "]" .. i, function()
-    lm.forward(i)
-  end, { desc = "repeat " .. i })
-  vim.keymap.set({ "n", "v", "o" }, "[" .. i, function()
-    lm.backward(i)
-  end, { desc = "repeat " .. i })
-end
-
-
 -- comma "," is not needed anymore, so I like to use it instead of ] as a motion prefix
 vim.keymap.set({"n", "v", "o"}, ",", "]", { remap = true })
-
-vim.keymap.set("n", "],", "<cmd>LastMotionNotify<CR>", { desc = "show last-motion history" })
 ```
 
 ## Manual Configuration
@@ -127,7 +93,6 @@ If you don't want to use any of the default configurations or keymaps, you can r
   config = function()
     local lm = require("last-motion")
     lm.setup({
-      max_motions = 10,
       default_next_previous_keys = false,
       square_motions = false,
       textobjects = false,
@@ -144,9 +109,6 @@ If you don't want to use any of the default configurations or keymaps, you can r
 
     -- add your own keymaps
     local mem = lm.func_motion(
-      -- it needs names for next/prev to be shown in the history
-      "]d",
-      "[d",
       function()
         vim.diagnostic.jump({ count = 1, float = true })
       end,
